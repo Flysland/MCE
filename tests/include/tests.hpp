@@ -21,12 +21,11 @@
     { \
         std::cout << "[" << __FUNCTION__ << ":" << __LINE__ << "] "; \
         ++TOTAL_TESTING_COUNTER_LABEL; \
-        if (x) \
+        if (X) { \
             std::cout << "OK" << std::endl; \
             ++TESTING_COUNTER_LABEL; \
-        else { \
+        } else \
             std::cout << "Failed" << std::endl; \
-        } \
     } \
 
 #define INIT_TEST() \
