@@ -5,7 +5,7 @@
 //
 ////////////////////////
 
-#include "scene.hpp"
+#include "engine/scene.hpp"
 
 namespace engine
 {

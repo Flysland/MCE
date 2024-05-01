@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "types.hpp"
-#include "world.hpp"
+#include "engine/types.hpp"
+#include "engine/world.hpp"
 
 namespace engine
 {
