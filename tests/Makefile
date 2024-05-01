@@ -11,40 +11,31 @@ COMPILER = g++
 FILE_TYPE = .cpp
 
 SRC =\
-	${SRC_PATH}/scene.cpp\
-	${SRC_PATH}/world.cpp\
+	${SRC_PATH}/main.cpp\
 
 INCLUDE =\
 	-I./include/\
+	-I../include/\
 
 OBJ = ${SRC:${SRC_PATH}/%${FILE_TYPE}=${BUILD_PATH}/%.o}
-OBJ_FLAGS = -W -Wall -Wextra -Werror ${INCLUDE} -fPIC -std=c++20
-BIN_FLAGS = -shared
-BIN_NAME = libengine.so
+OBJ_FLAGS = -g3 -W -Wall -Wextra -Werror ${INCLUDE} -std=c++20
+BIN_FLAGS =
+BIN_NAME = tests_run
 
 all: ${BIN_NAME}
-
-debug: OBJ_FLAGS += -DDEBUG -g3
-debug: ${BIN_NAME}
-
-tests_run: all
-	make -C tests
-	LD_LIBRARY_PATH=. valgrind ./tests/tests_run
 
 ${BUILD_PATH}/%.o: ${SRC_PATH}/%${FILE_TYPE}
 	mkdir -p ${dir $@}
 	${COMPILER} -MD ${OBJ_FLAGS} -c $< -o $@
 
 ${BIN_NAME}: ${OBJ}
-	${COMPILER} -o ${BIN_NAME} ${OBJ} ${BIN_FLAGS}
+	${COMPILER} -L../ -o ${BIN_NAME} ${OBJ} ${BIN_FLAGS} -lengine
 
 clean:
 	rm -rf ${BUILD_PATH}
-	make -C tests clean
 
 fclean: clean
 	rm -rf ${BIN_NAME}
-	make -C tests fclean
 
 -include ${OBJ:%.o=%.d}
 
