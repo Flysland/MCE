@@ -18,7 +18,7 @@ INCLUDE =\
 
 OBJ = ${SRC:${SRC_PATH}/%${FILE_TYPE}=${BUILD_PATH}/%.o}
 OBJ_FLAGS = -g3 -W -Wall -Wextra -Werror ${INCLUDE} -std=c++20
-BIN_FLAGS =
+BIN_FLAGS = -L../ -lengine
 BIN_NAME = tests_run
 
 all: ${BIN_NAME}
@@ -28,7 +28,7 @@ ${BUILD_PATH}/%.o: ${SRC_PATH}/%${FILE_TYPE}
 	${COMPILER} -MD ${OBJ_FLAGS} -c $< -o $@
 
 ${BIN_NAME}: ${OBJ}
-	${COMPILER} -L../ -o ${BIN_NAME} ${OBJ} ${BIN_FLAGS} -lengine
+	${COMPILER} -o ${BIN_NAME} ${OBJ} ${BIN_FLAGS}
 
 clean:
 	rm -rf ${BUILD_PATH}
