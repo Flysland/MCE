@@ -27,7 +27,7 @@ all: ${BIN_NAME}
 debug: OBJ_FLAGS += -DDEBUG -g3
 debug: ${BIN_NAME}
 
-tests_run: all
+tests_run: debug
 	make -C tests
 	LD_LIBRARY_PATH=. valgrind ./tests/tests_run
 
