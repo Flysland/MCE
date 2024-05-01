@@ -17,15 +17,15 @@
 #define TESTING_COUNTER_LABEL testing_counter
 #define TOTAL_TESTING_COUNTER_LABEL total_testing_counter
 
-#define CHECK(str, x) \
+#define CHECK(X) \
     { \
         std::cout << "[" << __FUNCTION__ << ":" << __LINE__ << "] "; \
         ++TOTAL_TESTING_COUNTER_LABEL; \
-        if (!(x)) \
-            std::cout << "Failed" << std::endl; \
-        else { \
+        if (x) \
             std::cout << "OK" << std::endl; \
             ++TESTING_COUNTER_LABEL; \
+        else { \
+            std::cout << "Failed" << std::endl; \
         } \
     } \
 
