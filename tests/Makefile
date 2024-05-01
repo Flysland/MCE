@@ -15,7 +15,6 @@ SRC =\
 
 INCLUDE =\
 	-I./include/\
-	-I../include/\
 
 OBJ = ${SRC:${SRC_PATH}/%${FILE_TYPE}=${BUILD_PATH}/%.o}
 OBJ_FLAGS = -g3 -W -Wall -Wextra -Werror ${INCLUDE} -std=c++20

@@ -6,7 +6,7 @@
 ////////////////////////
 
 #include "tests.hpp"
-#include "scene.hpp"
+#include "engine/scene.hpp"
 
 int main()
 {
