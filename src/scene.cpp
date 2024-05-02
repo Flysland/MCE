@@ -22,7 +22,10 @@ namespace engine
     { }
 
     Scene::~Scene()
-    { }
+    {
+        for (auto it = _worlds.begin(); it != _worlds.end(); ++it)
+            delete *it;
+    }
 
     Scene &Scene::operator=(const Scene &other)
     {

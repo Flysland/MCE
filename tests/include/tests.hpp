@@ -35,4 +35,9 @@
 
 #define TERMINATE_TEST() \
     std::cout << "[" << __FUNCTION__ << "] Terminate testing: " << \
-        TESTING_COUNTER_LABEL << "/" << TOTAL_TESTING_COUNTER_LABEL << std::endl;
+        TESTING_COUNTER_LABEL << "/" << TOTAL_TESTING_COUNTER_LABEL << std::endl; \
+
+namespace testing
+{
+    void test_scene();
+}
