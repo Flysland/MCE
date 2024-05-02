@@ -17,6 +17,7 @@ namespace testing
         engine::Scene scene = engine::Scene();
         engine::World *world_1 = scene.createWorld();
         engine::World *world_2 = scene.createWorld();
+        std::size_t world_1_id = world_1->getID();
 
         CHECK(world_1 != world_2)
         CHECK(world_1->getID() != world_2->getID())
@@ -26,6 +27,7 @@ namespace testing
 
         CHECK(world_1 != world_2)
         CHECK(world_1->getID() != world_2->getID())
+        CHECK(world_1_id == world_1->getID())
 
         TERMINATE_TEST()
     }
