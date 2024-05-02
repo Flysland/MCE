@@ -27,6 +27,7 @@ namespace engine
             World *createWorld();
 
             inline void applyRequests();
+            inline void update();
 
         private:
             std::size_t _current_world_id;
