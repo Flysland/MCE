@@ -5,6 +5,7 @@
 //
 ////////////////////////
 
+#include <algorithm>
 #include "engine/world.hpp"
 
 namespace engine
@@ -74,6 +75,9 @@ namespace engine
 
         _components.insert({std::type_index(typeid(T)), Components<T>()});
         _remove_component_methods.push_back(&World::requestRemoveComponent<T>);
+
+        if constexpr(HasUpdate<T>)
+            _update_methods.push_back(&World::executeMethod<T, &T::update>);
     }
 
     template<typename T>
@@ -85,7 +89,23 @@ namespace engine
             return;
 
         _components.erase(std::type_index(typeid(T)));
-        _remove_component_methods.erase(&World::requestRemoveComponent<T>);
+        _remove_component_methods.erase(
+            std::remove_if(_remove_component_methods.begin(), _remove_component_methods.end(),
+                [&](void (World::*method)(const Entity &entity)) {
+                    return method == &World::requestRemoveComponent<T>;
+                }),
+            _remove_component_methods.end()
+        );
+
+        if constexpr(HasUpdate<T>) {
+            _update_methods.erase(
+                std::remove_if(_update_methods.begin(), _update_methods.end(),
+                    [&](void (World::*method)()) {
+                        return method == &World::executeMethod<T, &T::update>;
+                    }),
+                _update_methods.end()
+            );
+        }
     }
 
     template<typename T>
@@ -103,6 +123,19 @@ namespace engine
             }
         }
         unregisterComponent<T>();
+    }
+
+    template<typename T, auto M, typename ... ARGS>
+    void World::executeMethod(ARGS &&... args)
+    {
+        Components<T> &components = getComponents<T>();
+
+        for (auto component = components.begin(); component != components.end(); ++component) {
+            if (!component->has_value())
+                continue;
+
+            (component->value().*M)(std::forward<ARGS>(args)...);
+        }
     }
 
     template<typename T>

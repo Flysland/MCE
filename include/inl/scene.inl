@@ -16,4 +16,10 @@ namespace engine
         for (auto it = _worlds.begin(); it != _worlds.end(); ++it)
             (*it)->applyRequests();
     }
+
+    inline void Scene::update()
+    {
+        for (auto it = _worlds.begin(); it != _worlds.end(); ++it)
+            (*it)->update();
+    }
 }

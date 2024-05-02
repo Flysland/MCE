@@ -56,10 +56,15 @@ namespace engine
             ComponentContainer _components;
             RequestContainer<Entity, World, void, const Entity &> _remove_component_requests;
             MethodContainer<World, void, const Entity &> _remove_component_methods;
+            MethodContainer<World, void> _update_methods;
 
             World(std::size_t id);
 
             void applyRequests();
+            void update();
+
+            template<typename T, auto M, typename ... ARGS>
+            void executeMethod(ARGS &&... args);
 
             template<typename T>
             void removeComponent(const Entity &entity);

@@ -11,5 +11,7 @@
 int main()
 {
     testing::test_scene();
+    testing::test_entities();
+    testing::test_components();
     return 0;
 }

@@ -16,6 +16,7 @@ namespace engine
         , _components()
         , _remove_component_requests()
         , _remove_component_methods()
+        , _update_methods()
     { }
 
     World::World(const World &other)
@@ -25,6 +26,7 @@ namespace engine
         , _components(other._components)
         , _remove_component_requests(other._remove_component_requests)
         , _remove_component_methods(other._remove_component_methods)
+        , _update_methods(other._update_methods)
     { }
 
     World::World(World &&other)
@@ -34,6 +36,7 @@ namespace engine
         , _components(other._components)
         , _remove_component_requests(other._remove_component_requests)
         , _remove_component_methods(other._remove_component_methods)
+        , _update_methods(other._update_methods)
     { }
 
     World::~World()
@@ -47,6 +50,7 @@ namespace engine
         _components = other._components;
         _remove_component_requests = other._remove_component_requests;
         _remove_component_methods = other._remove_component_methods;
+        _update_methods = other._update_methods;
 
         return *this;
     }
@@ -59,6 +63,7 @@ namespace engine
         _components = other._components;
         _remove_component_requests = other._remove_component_requests;
         _remove_component_methods = other._remove_component_methods;
+        _update_methods = other._update_methods;
 
         return *this;
     }
@@ -89,5 +94,11 @@ namespace engine
             (*this.*it->second)(it->first);
 
         _remove_component_requests.clear();
+    }
+
+    void World::update()
+    {
+        for (auto it = _update_methods.begin(); it != _update_methods.end(); ++it)
+            (*this.**it)();
     }
 }
