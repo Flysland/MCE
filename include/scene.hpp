@@ -24,12 +24,13 @@ namespace engine
             Scene &operator=(Scene &&other);
 
             void destroyWorld(World *world);
+            World *createWorld();
 
-            inline World *createWorld();
             inline void applyRequests();
 
         private:
             std::size_t _current_world_id;
+            std::vector<std::size_t> _available_world_ids;
             std::vector<World *> _worlds;
     };
 }
