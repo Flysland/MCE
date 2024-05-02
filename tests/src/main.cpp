@@ -10,5 +10,6 @@
 
 int main()
 {
+    testing::test_scene();
     return 0;
 }

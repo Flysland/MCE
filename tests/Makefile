@@ -12,6 +12,7 @@ FILE_TYPE = .cpp
 
 SRC =\
 	${SRC_PATH}/main.cpp\
+	${SRC_PATH}/scene.cpp\
 
 INCLUDE =\
 	-I./include/\
