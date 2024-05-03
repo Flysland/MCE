@@ -22,11 +22,14 @@ namespace engine
     using Entities = std::vector<Entity>;
     using ComponentContainer = std::unordered_map<std::type_index, std::any>;
 
+    template<typename T, typename R, typename ... ARGS>
+    using Method = R (T::*)(ARGS...);
+
     template<typename KEY, typename T, typename R, typename ... ARGS>
-    using RequestContainer = std::vector<std::pair<KEY, R (T::*)(ARGS...)>>;
+    using RequestContainer = std::vector<std::pair<KEY, Method<T, R, ARGS...>>>;
 
     template<typename T, typename R, typename ... ARGS>
-    using MethodContainer = std::vector<R (T::*)(ARGS...)>;
+    using MethodContainer = std::vector<Method<T, R, ARGS...>>;
 
     template<typename T>
     using Component = std::optional<T>;
@@ -42,7 +45,4 @@ namespace engine
 
     template<typename T>
     concept HasInit = HasMethod<T, &T::init, void, World *, const Entity &>;
-
-    template<typename T>
-    concept HasUpdate = HasMethod<T, &T::update, void>;
 }

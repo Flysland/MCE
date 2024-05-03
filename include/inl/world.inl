@@ -76,8 +76,7 @@ namespace engine
         _components.insert({std::type_index(typeid(T)), Components<T>()});
         _remove_component_methods.push_back(&World::requestRemoveComponent<T>);
 
-        if constexpr(HasUpdate<T>)
-            _update_methods.push_back(&World::executeMethod<T, &T::update>);
+        registerCustomMethods<T>(this);
     }
 
     template<typename T>
@@ -97,15 +96,7 @@ namespace engine
             _remove_component_methods.end()
         );
 
-        if constexpr(HasUpdate<T>) {
-            _update_methods.erase(
-                std::remove_if(_update_methods.begin(), _update_methods.end(),
-                    [&](void (World::*method)()) {
-                        return method == &World::executeMethod<T, &T::update>;
-                    }),
-                _update_methods.end()
-            );
-        }
+        unregisterCustomMethods<T>(this);
     }
 
     template<typename T>
