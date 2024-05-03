@@ -15,6 +15,12 @@ namespace engine
     {
         friend class Scene;
 
+        template<typename T>
+        friend void registerCustomMethods(World *world);
+
+        template<typename T>
+        friend void unregisterCustomMethods(World *world);
+
         public:
             World(const World &other);
             World(World &&other);
@@ -56,12 +62,14 @@ namespace engine
             ComponentContainer _components;
             RequestContainer<Entity, World, void, const Entity &> _remove_component_requests;
             MethodContainer<World, void, const Entity &> _remove_component_methods;
-            MethodContainer<World, void> _update_methods;
+            std::unordered_map<std::size_t, MethodContainer<World, void>> _custom_methods;
 
             World(std::size_t id);
 
             void applyRequests();
-            void update();
+            void registerCustomMethod(std::size_t id, Method<World, void> method);
+            void unregisterCustomMethod(std::size_t id, Method<World, void> method);
+            void launchCustomMethod(std::size_t id);
 
             template<typename T, auto M, typename ... ARGS>
             void executeMethod(ARGS &&... args);

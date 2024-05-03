@@ -95,7 +95,7 @@ namespace testing
 
         CHECK(!world->getComponent<TestComponentUpdate>(entity)->update_called);
 
-        scene.update();
+        scene.launchCustomMethod(UPDATE_METHOD_ID);
 
         CHECK(world->getComponent<TestComponentUpdate>(entity)->update_called);
 

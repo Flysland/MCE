@@ -16,7 +16,7 @@ namespace engine
         , _components()
         , _remove_component_requests()
         , _remove_component_methods()
-        , _update_methods()
+        , _custom_methods()
     { }
 
     World::World(const World &other)
@@ -26,7 +26,7 @@ namespace engine
         , _components(other._components)
         , _remove_component_requests(other._remove_component_requests)
         , _remove_component_methods(other._remove_component_methods)
-        , _update_methods(other._update_methods)
+        , _custom_methods(other._custom_methods)
     { }
 
     World::World(World &&other)
@@ -36,7 +36,7 @@ namespace engine
         , _components(other._components)
         , _remove_component_requests(other._remove_component_requests)
         , _remove_component_methods(other._remove_component_methods)
-        , _update_methods(other._update_methods)
+        , _custom_methods(other._custom_methods)
     { }
 
     World::~World()
@@ -50,7 +50,7 @@ namespace engine
         _components = other._components;
         _remove_component_requests = other._remove_component_requests;
         _remove_component_methods = other._remove_component_methods;
-        _update_methods = other._update_methods;
+        _custom_methods = other._custom_methods;
 
         return *this;
     }
@@ -63,7 +63,7 @@ namespace engine
         _components = other._components;
         _remove_component_requests = other._remove_component_requests;
         _remove_component_methods = other._remove_component_methods;
-        _update_methods = other._update_methods;
+        _custom_methods = other._custom_methods;
 
         return *this;
     }
@@ -96,9 +96,42 @@ namespace engine
         _remove_component_requests.clear();
     }
 
-    void World::update()
+    void World::registerCustomMethod(std::size_t id, Method<World, void> method)
     {
-        for (auto it = _update_methods.begin(); it != _update_methods.end(); ++it)
-            (*this.**it)();
+        auto methods = _custom_methods.find(id);
+
+        if (methods == _custom_methods.end()) {
+            _custom_methods.insert({id, MethodContainer<World, void>()});
+            methods = _custom_methods.find(id);
+        }
+
+        methods->second.push_back(method);
+    }
+
+    void World::unregisterCustomMethod(std::size_t id, Method<World, void> method)
+    {
+        auto methods = _custom_methods.find(id);
+
+        if (methods == _custom_methods.end())
+            return;
+
+        methods->second.erase(
+            std::remove_if(methods->second.begin(), methods->second.end(),
+                [&](void (World::*m)()) {
+                    return m == method;
+                }),
+            methods->second.end()
+        );
+    }
+
+    void World::launchCustomMethod(std::size_t id)
+    {
+        auto methods = _custom_methods.find(id);
+
+        if (methods == _custom_methods.end())
+            return;
+
+        for (auto method = methods->second.begin(); method != methods->second.end(); ++method)
+            (*this.**method)();
     }
 }

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <iostream>
+#include "engine/world.hpp"
 
 #define UNUSED(X) ((void)X)
 
@@ -36,6 +37,28 @@
 #define TERMINATE_TEST() \
     std::cout << "[" << __FUNCTION__ << "] Terminate testing: " << \
         TESTING_COUNTER_LABEL << "/" << TOTAL_TESTING_COUNTER_LABEL << std::endl; \
+
+#define UPDATE_METHOD_ID 0
+
+template<typename T>
+concept HasUpdate = engine::HasMethod<T, &T::update, void>;
+
+namespace engine
+{
+    template<typename T>
+    void registerCustomMethods(World *world)
+    {
+        if constexpr(HasUpdate<T>)
+            world->registerCustomMethod(UPDATE_METHOD_ID, &World::executeMethod<T, &T::update>);
+    }
+
+    template<typename T>
+    void unregisterCustomMethods(World *world)
+    {
+        if constexpr(HasUpdate<T>)
+            world->unregisterCustomMethod(UPDATE_METHOD_ID, &World::executeMethod<T, &T::update>);
+    }
+}
 
 namespace testing
 {

@@ -17,9 +17,9 @@ namespace engine
             (*it)->applyRequests();
     }
 
-    inline void Scene::update()
+    inline void Scene::launchCustomMethod(std::size_t id)
     {
         for (auto it = _worlds.begin(); it != _worlds.end(); ++it)
-            (*it)->update();
+            (*it)->launchCustomMethod(id);
     }
 }
