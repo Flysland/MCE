@@ -96,34 +96,6 @@ namespace engine
         _remove_component_requests.clear();
     }
 
-    void World::registerCustomMethod(std::size_t id, Method<World, void> method)
-    {
-        auto methods = _custom_methods.find(id);
-
-        if (methods == _custom_methods.end()) {
-            _custom_methods.insert({id, MethodContainer<World, void>()});
-            methods = _custom_methods.find(id);
-        }
-
-        methods->second.push_back(method);
-    }
-
-    void World::unregisterCustomMethod(std::size_t id, Method<World, void> method)
-    {
-        auto methods = _custom_methods.find(id);
-
-        if (methods == _custom_methods.end())
-            return;
-
-        methods->second.erase(
-            std::remove_if(methods->second.begin(), methods->second.end(),
-                [&](void (World::*m)()) {
-                    return m == method;
-                }),
-            methods->second.end()
-        );
-    }
-
     void World::launchCustomMethod(std::size_t id)
     {
         auto methods = _custom_methods.find(id);

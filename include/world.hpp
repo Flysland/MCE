@@ -15,12 +15,6 @@ namespace engine
     {
         friend class Scene;
 
-        template<typename T>
-        friend void registerCustomMethods(World *world);
-
-        template<typename T>
-        friend void unregisterCustomMethods(World *world);
-
         public:
             World(const World &other);
             World(World &&other);
@@ -55,6 +49,12 @@ namespace engine
             template<typename T>
             void optimizeComponents();
 
+            template<typename T, auto M>
+            void registerCustomMethod(std::size_t id);
+
+            template<typename T, auto M>
+            void unregisterCustomMethod(std::size_t id);
+
         private:
             std::size_t _id;
             Entity _current_entity;
@@ -67,8 +67,6 @@ namespace engine
             World(std::size_t id);
 
             void applyRequests();
-            void registerCustomMethod(std::size_t id, Method<World, void> method);
-            void unregisterCustomMethod(std::size_t id, Method<World, void> method);
             void launchCustomMethod(std::size_t id);
 
             template<typename T, auto M, typename ... ARGS>

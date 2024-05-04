@@ -116,6 +116,39 @@ namespace engine
         unregisterComponent<T>();
     }
 
+    template<typename T, auto M>
+    void World::registerCustomMethod(std::size_t id)
+    {
+        auto methods = _custom_methods.find(id);
+
+        if (methods == _custom_methods.end()) {
+            _custom_methods.insert({id, MethodContainer<World, void>()});
+            methods = _custom_methods.find(id);
+        }
+
+        methods->second.push_back(&World::executeMethod<T, M>);
+    }
+
+    template<typename T, auto M>
+    void World::unregisterCustomMethod(std::size_t id)
+    {
+        auto methods = _custom_methods.find(id);
+
+        if (methods == _custom_methods.end())
+            return;
+
+        methods->second.erase(
+            std::remove_if(methods->second.begin(), methods->second.end(),
+                [&](void (World::*method)()) {
+                    return method == &World::executeMethod<T, M>;
+                }),
+            methods->second.end()
+        );
+
+        if (!methods->second.size())
+            _custom_methods.erase(methods);
+    }
+
     template<typename T, auto M, typename ... ARGS>
     void World::executeMethod(ARGS &&... args)
     {
