@@ -47,9 +47,45 @@ using ExampleComponent = struct ExampleComponent
     // Called at the creation of the component
     void init(engine::World *world, engine::Entity entity)
     { }
-
-    // Called when we call 'scene.update()'
-    void update()
-    { }
 };
+```
+
+You can register your own custom methods. For example, there is the way to create a ``update`` custom method. A custom method must have this prototype:
+```cpp
+void MyComponent::method();
+```
+```cpp
+// unique identifier for the 'update' method
+#define UPDATE_METHOD_ID 0
+
+// Concept to check if the type contain the 'update' method
+template<typename T>
+concept HasUpdate = engine::HasCustomMethod<T, &T::update>;
+
+namespace engine
+{
+    // Register all custom methods (it called when we register a new component)
+    template<typename T>
+    void registerCustomMethods(World *world)
+    {
+        // Check if the type contain the 'update' method
+        if constexpr(HasUpdate<T>)
+            // Register the 'update' method
+            world->registerCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
+    }
+
+    // Unregister all custom methods (it called when we unregister a component)
+    template<typename T>
+    void unregisterCustomMethods(World *world)
+    {
+        // Check if the type contain the 'update' method
+        if constexpr(HasUpdate<T>)
+            // Unregister the 'update' method
+            world->unregisterCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
+    }
+}
+```
+We can now call this method like this:
+```cpp
+scene.launchCustomMethod(UPDATE_METHOD_ID);
 ```

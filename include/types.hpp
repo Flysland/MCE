@@ -43,6 +43,9 @@ namespace engine
         { (t.*M)(std::forward<ARGS>(args)...) } -> std::same_as<R>;
     };
 
+    template<typename T, auto M>
+    concept HasCustomMethod = HasMethod<T, M, void>;
+
     template<typename T>
     concept HasInit = HasMethod<T, &T::init, void, World *, const Entity &>;
 }

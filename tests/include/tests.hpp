@@ -49,14 +49,14 @@ namespace engine
     void registerCustomMethods(World *world)
     {
         if constexpr(HasUpdate<T>)
-            world->registerCustomMethod(UPDATE_METHOD_ID, &World::executeMethod<T, &T::update>);
+            world->registerCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
     }
 
     template<typename T>
     void unregisterCustomMethods(World *world)
     {
         if constexpr(HasUpdate<T>)
-            world->unregisterCustomMethod(UPDATE_METHOD_ID, &World::executeMethod<T, &T::update>);
+            world->unregisterCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
     }
 }
 
