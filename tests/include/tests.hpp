@@ -8,9 +8,7 @@
 #pragma once
 
 #include <iostream>
-#include "engine/world.hpp"
-
-#define UNUSED(X) ((void)X)
+#include "engine/engine.hpp"
 
 #define INIT_COUNTER(X, V) std::size_t X = V;
 #define INIT_STR(X, V) std::string X = V;
