@@ -14,7 +14,6 @@ namespace engine
     template<typename T>
     class Components
     {
-
         public:
             using container = std::vector<Component<T>>;
             using iterator = container::iterator;

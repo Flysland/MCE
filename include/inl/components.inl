@@ -40,6 +40,7 @@ namespace engine
         m_components = other.m_components;
         m_entity_start = other.m_entity_start;
         m_entity_end = other.m_entity_end;
+
         return *this;
     }
 
@@ -49,6 +50,7 @@ namespace engine
         m_components = other.m_components;
         m_entity_start = other.m_entity_start;
         m_entity_end = other.m_entity_end;
+
         return *this;
     }
 
