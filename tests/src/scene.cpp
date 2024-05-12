@@ -6,7 +6,6 @@
 ////////////////////////
 
 #include "tests.hpp"
-#include "engine/scene.hpp"
 
 namespace testing
 {
