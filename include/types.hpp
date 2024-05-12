@@ -34,9 +34,6 @@ namespace engine
     template<typename T>
     using Component = std::optional<T>;
 
-    template<typename T>
-    using Components = std::vector<Component<T>>;
-
     template<typename T, auto M, typename R, typename ... ARGS>
     concept HasMethod = requires(T &t, ARGS &&... args)
     {

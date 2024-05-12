@@ -20,18 +20,17 @@ namespace engine
     {
         Components<T> &components = getComponents<T>();
 
-        if (components.size() <= entity)
-            components.resize(entity + 1);
+        components.insert_entity(entity);
 
-        if (components.at(entity).has_value())
-            return components.at(entity);
+        if (components.get(entity).has_value())
+            return components.get(entity);
 
-        components.at(entity).emplace(std::forward<ARGS>(args)...);
+        components.get(entity).emplace(std::forward<ARGS>(args)...);
 
         if constexpr(HasInit<T>)
-            components.at(entity)->init(this, entity);
+            components.get(entity)->init(this, entity);
 
-        return components.at(entity);
+        return components.get(entity);
     }
 
     template<typename T>
@@ -41,15 +40,9 @@ namespace engine
     }
 
     template<typename T>
-    Component<T> &World::getComponent(const Entity &entity)
+    inline Component<T> &World::getComponent(const Entity &entity)
     {
-        static Component<T> empty_component = std::nullopt;
-        Components<T> &components = getComponents<T>();
-
-        if (components.size() <= entity)
-            return empty_component;
-
-        return components.at(entity);
+        return getComponents<T>().get(entity);
     }
 
     template<typename T>
@@ -97,23 +90,6 @@ namespace engine
         );
 
         unregisterCustomMethods<T>(this);
-    }
-
-    template<typename T>
-    void World::optimizeComponents()
-    {
-        Components<T> &components = getComponents<T>();
-
-        if (!components.size())
-            return;
-
-        for (long i = components.size() - 1; i >= 0; --i) {
-            if (components.at(i).has_value()) {
-                components.resize(i + 1);
-                return;
-            }
-        }
-        unregisterComponent<T>();
     }
 
     template<typename T, auto M>
@@ -167,10 +143,13 @@ namespace engine
     {
         Components<T> &components = getComponents<T>();
 
-        if (components.size() <= entity || !components.at(entity).has_value())
+        if (!components.contain(entity) || !components.get(entity).has_value())
             return;
 
-        components.at(entity).reset();
-        optimizeComponents<T>();
+        components.get(entity).reset();
+        components.optimize();
+
+        if (!components.size())
+            unregisterComponent<T>();
     }
 }
