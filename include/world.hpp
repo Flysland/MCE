@@ -8,6 +8,7 @@
 #pragma once
 
 #include "engine/types.hpp"
+#include "engine/components.hpp"
 
 namespace engine
 {
@@ -35,7 +36,7 @@ namespace engine
             inline void requestRemoveComponent(const Entity &entity);
 
             template<typename T>
-            Component<T> &getComponent(const Entity &entity);
+            inline Component<T> &getComponent(const Entity &entity);
 
             template<typename T>
             Components<T> &getComponents();
@@ -45,9 +46,6 @@ namespace engine
 
             template<typename T>
             void unregisterComponent();
-
-            template<typename T>
-            void optimizeComponents();
 
             template<typename T, auto M>
             void registerCustomMethod(std::size_t id);

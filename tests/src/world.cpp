@@ -70,6 +70,7 @@ namespace testing
         engine::Scene scene = engine::Scene();
         engine::World *world = scene.createWorld();
         engine::Entity entity = world->createEntity();
+        engine::Entity entity2 = world->createEntity();
 
         CHECK(!world->getComponent<int>(entity).has_value())
 
@@ -79,11 +80,19 @@ namespace testing
         CHECK(world->getComponent<int>(entity).value() == 42)
         CHECK(world->getComponents<int>().size() == 1)
 
+        world->addComponent<int>(entity2, 84);
+
+        CHECK(world->getComponent<int>(entity2).has_value())
+        CHECK(world->getComponent<int>(entity2).value() == 84)
+        CHECK(world->getComponents<int>().size() == 2)
+
         world->requestRemoveComponent<int>(entity);
         scene.applyRequests();
 
         CHECK(!world->getComponent<int>(entity).has_value())
-        CHECK(world->getComponents<int>().size() == 0)
+        CHECK(world->getComponent<int>(entity2).has_value())
+        CHECK(world->getComponent<int>(entity2).value() == 84)
+        CHECK(world->getComponents<int>().size() == 1)
 
         world->addComponent<TestComponentInit>(entity);
 
