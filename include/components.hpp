@@ -43,9 +43,9 @@ namespace engine
             const Component<T> &get(const Entity &entity) const;
 
         private:
-            container m_components;
-            Entity m_entity_start;
-            Entity m_entity_end;
+            container _components;
+            Entity _entity_start;
+            Entity _entity_end;
 
             Component<T> &insert_front(const Entity &entity);
             Component<T> &insert_back(const Entity &entity);
