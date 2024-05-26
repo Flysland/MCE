@@ -193,15 +193,16 @@ namespace engine
     {
         std::size_t index = 0;
 
-        for (auto it = _components.begin(); it != _components.end(); ++it, ++index) {
-            if (it->has_value()) {
+        for (Component<T> &component: _components) {
+            if (component.has_value()) {
                 if (!index)
                     return;
 
-                _components.erase(_components.begin(), it);
+                _components.erase(_components.begin(), _components.begin() + index);
                 _entity_start += index;
                 return;
             }
+            ++index;
         }
         clear();
     }
