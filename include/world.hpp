@@ -47,10 +47,10 @@ namespace engine
             template<typename T>
             void unregisterComponent();
 
-            template<typename T, auto M>
+            template<typename T, auto M, typename ... ARGS>
             void registerCustomMethod(std::size_t id);
 
-            template<typename T, auto M>
+            template<typename T, auto M, typename ... ARGS>
             void unregisterCustomMethod(std::size_t id);
 
         private:
@@ -61,12 +61,14 @@ namespace engine
             RequestContainer<Entity, World, void, const Entity &> _remove_component_requests;
             RequestContainer<Entity, World, void, const Entity &> _destroy_entity_requests;
             MethodContainer<World, void, const Entity &> _remove_component_methods;
-            std::unordered_map<std::size_t, MethodContainer<World, void>> _custom_methods;
+            std::unordered_map<std::size_t, std::any> _custom_methods;
 
             World(std::size_t id);
 
             void applyRequests();
-            void launchCustomMethod(std::size_t id);
+
+            template<typename ... ARGS>
+            void launchCustomMethod(std::size_t id, ARGS &&... args);
 
             inline void destroyEntity(const Entity &entity);
 

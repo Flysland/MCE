@@ -32,14 +32,29 @@ namespace testing
     using TestComponentUpdate = struct TestComponentUpdate
     {
         bool update_called;
+        int a;
+        int *ptr;
 
         TestComponentUpdate()
             : update_called(false)
+            , a(0)
+            , ptr(nullptr)
         { }
 
         void update()
         {
             update_called = true;
+        }
+
+        void updateWithParam(int a)
+        {
+            this->a = a;
+        }
+
+        void referenceMethod(int &a)
+        {
+            this->ptr = &a;
+            a = 12;
         }
     };
 
@@ -102,11 +117,22 @@ namespace testing
         world->addComponent<TestComponentUpdate>(entity);
 
         CHECK(!world->getComponent<TestComponentUpdate>(entity)->update_called);
+        CHECK(world->getComponent<TestComponentUpdate>(entity)->a == 0);
+        CHECK(world->getComponent<TestComponentUpdate>(entity)->ptr == nullptr);
 
         scene.launchCustomMethod(UPDATE_METHOD_ID);
 
         CHECK(world->getComponent<TestComponentUpdate>(entity)->update_called);
 
+        scene.launchCustomMethod(UPDATE_WITH_PARAM_METHOD_ID, 42);
+
+        CHECK(world->getComponent<TestComponentUpdate>(entity)->a == 42);
+
+        int value = 42;
+        scene.launchCustomMethod(REFERENCE_CUSTOM_METHOD_ID, value);
+
+        CHECK(world->getComponent<TestComponentUpdate>(entity)->ptr == &value);
+        CHECK(value == 12);
         TERMINATE_TEST()
     }
 }

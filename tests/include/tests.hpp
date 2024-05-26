@@ -37,9 +37,17 @@
         TESTING_COUNTER_LABEL << "/" << TOTAL_TESTING_COUNTER_LABEL << std::endl; \
 
 #define UPDATE_METHOD_ID 0
+#define UPDATE_WITH_PARAM_METHOD_ID 1
+#define REFERENCE_CUSTOM_METHOD_ID 2
 
 template<typename T>
-concept HasUpdate = engine::HasMethod<T, &T::update, void>;
+concept HasUpdate = engine::HasCustomMethod<T, &T::update>;
+
+template<typename T>
+concept HasUpdateWithParam = engine::HasCustomMethod<T, &T::updateWithParam, int>;
+
+template<typename T>
+concept HasReferenceCustomMethod = engine::HasCustomMethod<T, &T::referenceMethod, int &>;
 
 namespace engine
 {
@@ -48,6 +56,12 @@ namespace engine
     {
         if constexpr(HasUpdate<T>)
             world->registerCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
+
+        if constexpr(HasUpdateWithParam<T>)
+            world->registerCustomMethod<T, &T::updateWithParam, int>(UPDATE_WITH_PARAM_METHOD_ID);
+
+        if constexpr(HasReferenceCustomMethod<T>)
+            world->registerCustomMethod<T, &T::referenceMethod, int &>(REFERENCE_CUSTOM_METHOD_ID);
     }
 
     template<typename T>
@@ -55,6 +69,12 @@ namespace engine
     {
         if constexpr(HasUpdate<T>)
             world->unregisterCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
+
+        if constexpr(HasUpdateWithParam<T>)
+            world->unregisterCustomMethod<T, &T::updateWithParam, int>(UPDATE_WITH_PARAM_METHOD_ID);
+
+        if constexpr(HasReferenceCustomMethod<T>)
+            world->unregisterCustomMethod<T, &T::referenceMethod, int &>(REFERENCE_CUSTOM_METHOD_ID);
     }
 }
 
