@@ -125,6 +125,11 @@ namespace engine
             _custom_methods.erase(methods);
     }
 
+    inline void World::destroyEntity(const Entity &entity)
+    {
+        _available_entities.push_back(entity);
+    }
+
     template<typename T, auto M, typename ... ARGS>
     void World::executeMethod(ARGS &&... args)
     {

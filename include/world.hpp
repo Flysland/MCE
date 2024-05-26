@@ -59,6 +59,7 @@ namespace engine
             Entities _available_entities;
             ComponentContainer _components;
             RequestContainer<Entity, World, void, const Entity &> _remove_component_requests;
+            RequestContainer<Entity, World, void, const Entity &> _destroy_entity_requests;
             MethodContainer<World, void, const Entity &> _remove_component_methods;
             std::unordered_map<std::size_t, MethodContainer<World, void>> _custom_methods;
 
@@ -66,6 +67,8 @@ namespace engine
 
             void applyRequests();
             void launchCustomMethod(std::size_t id);
+
+            inline void destroyEntity(const Entity &entity);
 
             template<typename T, auto M, typename ... ARGS>
             void executeMethod(ARGS &&... args);

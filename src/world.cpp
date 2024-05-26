@@ -15,6 +15,7 @@ namespace engine
         , _available_entities()
         , _components()
         , _remove_component_requests()
+        , _destroy_entity_requests()
         , _remove_component_methods()
         , _custom_methods()
     { }
@@ -25,6 +26,7 @@ namespace engine
         , _available_entities(other._available_entities)
         , _components(other._components)
         , _remove_component_requests(other._remove_component_requests)
+        , _destroy_entity_requests(other._destroy_entity_requests)
         , _remove_component_methods(other._remove_component_methods)
         , _custom_methods(other._custom_methods)
     { }
@@ -35,6 +37,7 @@ namespace engine
         , _available_entities(other._available_entities)
         , _components(other._components)
         , _remove_component_requests(other._remove_component_requests)
+        , _destroy_entity_requests(other._destroy_entity_requests)
         , _remove_component_methods(other._remove_component_methods)
         , _custom_methods(other._custom_methods)
     { }
@@ -49,6 +52,7 @@ namespace engine
         _available_entities = other._available_entities;
         _components = other._components;
         _remove_component_requests = other._remove_component_requests;
+        _destroy_entity_requests = other._destroy_entity_requests;
         _remove_component_methods = other._remove_component_methods;
         _custom_methods = other._custom_methods;
 
@@ -62,6 +66,7 @@ namespace engine
         _available_entities = other._available_entities;
         _components = other._components;
         _remove_component_requests = other._remove_component_requests;
+        _destroy_entity_requests = other._destroy_entity_requests;
         _remove_component_methods = other._remove_component_methods;
         _custom_methods = other._custom_methods;
 
@@ -82,10 +87,10 @@ namespace engine
 
     void World::requestDestroyEntity(const Entity &entity)
     {
-        _available_entities.push_back(entity);
-
         for (auto &method: _remove_component_methods)
             (this->*method)(entity);
+
+        _destroy_entity_requests.push_back({entity, &World::destroyEntity});
     }
 
     void World::applyRequests()
@@ -93,7 +98,11 @@ namespace engine
         for (auto &request: _remove_component_requests)
             (this->*request.second)(request.first);
 
+        for (auto &request: _destroy_entity_requests)
+            (this->*request.second)(request.first);
+
         _remove_component_requests.clear();
+        _destroy_entity_requests.clear();
     }
 
     void World::launchCustomMethod(std::size_t id)
