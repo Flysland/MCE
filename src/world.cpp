@@ -84,14 +84,14 @@ namespace engine
     {
         _available_entities.push_back(entity);
 
-        for (auto it = _remove_component_methods.begin(); it != _remove_component_methods.end(); ++it)
-            (*this.**it)(entity);
+        for (auto &method: _remove_component_methods)
+            (this->*method)(entity);
     }
 
     void World::applyRequests()
     {
-        for (auto it = _remove_component_requests.begin(); it != _remove_component_requests.end(); ++it)
-            (*this.*it->second)(it->first);
+        for (auto &request: _remove_component_requests)
+            (this->*request.second)(request.first);
 
         _remove_component_requests.clear();
     }
@@ -103,7 +103,7 @@ namespace engine
         if (methods == _custom_methods.end())
             return;
 
-        for (auto method = methods->second.begin(); method != methods->second.end(); ++method)
-            (*this.**method)();
+        for (auto &method: methods->second)
+            (this->*method)();
     }
 }
