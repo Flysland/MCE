@@ -13,13 +13,13 @@ namespace engine
 {
     inline void Scene::applyRequests()
     {
-        for (auto it = _worlds.begin(); it != _worlds.end(); ++it)
-            (*it)->applyRequests();
+        for (World *&world: _worlds)
+            world->applyRequests();
     }
 
     inline void Scene::launchCustomMethod(std::size_t id)
     {
-        for (auto it = _worlds.begin(); it != _worlds.end(); ++it)
-            (*it)->launchCustomMethod(id);
+        for (World *&world: _worlds)
+            world->launchCustomMethod(id);
     }
 }

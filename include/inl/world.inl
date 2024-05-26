@@ -130,11 +130,11 @@ namespace engine
     {
         Components<T> &components = getComponents<T>();
 
-        for (auto component = components.begin(); component != components.end(); ++component) {
-            if (!component->has_value())
+        for (Component<T> &component: components) {
+            if (!component.has_value())
                 continue;
 
-            (component->value().*M)(std::forward<ARGS>(args)...);
+            (component.value().*M)(std::forward<ARGS>(args)...);
         }
     }
 
