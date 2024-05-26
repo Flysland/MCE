@@ -23,7 +23,7 @@ namespace engine
     using ComponentContainer = std::unordered_map<std::type_index, std::any>;
 
     template<typename T, typename R, typename ... ARGS>
-    using Method = R (T::*)(ARGS...);
+    using Method = R (T::*)(ARGS &&...);
 
     template<typename KEY, typename T, typename R, typename ... ARGS>
     using RequestContainer = std::vector<std::pair<KEY, Method<T, R, ARGS...>>>;
@@ -40,8 +40,8 @@ namespace engine
         { (t.*M)(std::forward<ARGS>(args)...) } -> std::same_as<R>;
     };
 
-    template<typename T, auto M>
-    concept HasCustomMethod = HasMethod<T, M, void>;
+    template<typename T, auto M, typename ... ARGS>
+    concept HasCustomMethod = HasMethod<T, M, void, ARGS...>;
 
     template<typename T>
     concept HasInit = HasMethod<T, &T::init, void, World *, const Entity &>;

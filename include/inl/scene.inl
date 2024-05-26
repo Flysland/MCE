@@ -17,9 +17,10 @@ namespace engine
             world->applyRequests();
     }
 
-    inline void Scene::launchCustomMethod(std::size_t id)
+    template<typename ... ARGS>
+    inline void Scene::launchCustomMethod(std::size_t id, ARGS &&... args)
     {
         for (World *&world: _worlds)
-            world->launchCustomMethod(id);
+            world->launchCustomMethod<ARGS...>(id, std::forward<ARGS>(args)...);
     }
 }

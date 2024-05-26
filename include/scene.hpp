@@ -27,7 +27,9 @@ namespace engine
             World *createWorld();
 
             inline void applyRequests();
-            inline void launchCustomMethod(std::size_t id);
+
+            template<typename ... ARGS>
+            inline void launchCustomMethod(std::size_t id, ARGS &&... args);
 
         private:
             std::size_t _current_world_id;

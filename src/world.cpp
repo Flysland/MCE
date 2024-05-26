@@ -104,15 +104,4 @@ namespace engine
         _remove_component_requests.clear();
         _destroy_entity_requests.clear();
     }
-
-    void World::launchCustomMethod(std::size_t id)
-    {
-        auto methods = _custom_methods.find(id);
-
-        if (methods == _custom_methods.end())
-            return;
-
-        for (auto &method: methods->second)
-            (this->*method)();
-    }
 }

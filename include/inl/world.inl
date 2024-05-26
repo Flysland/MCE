@@ -92,20 +92,21 @@ namespace engine
         unregisterCustomMethods<T>(this);
     }
 
-    template<typename T, auto M>
+    template<typename T, auto M, typename ... ARGS>
     void World::registerCustomMethod(std::size_t id)
     {
         auto methods = _custom_methods.find(id);
 
         if (methods == _custom_methods.end()) {
-            _custom_methods.insert({id, MethodContainer<World, void>()});
+            _custom_methods.insert({id, MethodContainer<World, void, ARGS...>()});
             methods = _custom_methods.find(id);
         }
 
-        methods->second.push_back(&World::executeMethod<T, M>);
+        auto &container = std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second);
+        container.push_back(static_cast<Method<World, void, ARGS...>>(&World::template executeMethod<T, M, ARGS...>));
     }
 
-    template<typename T, auto M>
+    template<typename T, auto M, typename ... ARGS>
     void World::unregisterCustomMethod(std::size_t id)
     {
         auto methods = _custom_methods.find(id);
@@ -113,16 +114,30 @@ namespace engine
         if (methods == _custom_methods.end())
             return;
 
-        methods->second.erase(
-            std::remove_if(methods->second.begin(), methods->second.end(),
-                [&](void (World::*method)()) {
-                    return method == &World::executeMethod<T, M>;
+        MethodContainer<World, void, ARGS...> &container = std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second);
+
+        container.erase(
+            std::remove_if(container.begin(), container.end(),
+                [&](Method<World, void, ARGS...> method) {
+                    return method == &World::executeMethod<T, M, ARGS...>;
                 }),
-            methods->second.end()
+            container.end()
         );
 
-        if (!methods->second.size())
+        if (!container.size())
             _custom_methods.erase(methods);
+    }
+
+    template<typename ... ARGS>
+    void World::launchCustomMethod(std::size_t id, ARGS &&... args)
+    {
+        auto methods = _custom_methods.find(id);
+
+        if (methods == _custom_methods.end())
+            return;
+
+        for (auto &method: std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second))
+            (this->*method)(std::forward<ARGS>(args)...);
     }
 
     inline void World::destroyEntity(const Entity &entity)
