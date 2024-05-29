@@ -44,5 +44,5 @@ namespace engine
     concept HasCustomMethod = HasMethod<T, M, void, ARGS...>;
 
     template<typename T>
-    concept HasInit = HasMethod<T, &T::init, void, World *, const Entity &>;
+    concept HasInit = HasCustomMethod<T, &T::init, World *, const Entity &>;
 }
