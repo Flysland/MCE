@@ -102,8 +102,7 @@ namespace engine
             methods = _custom_methods.find(id);
         }
 
-        auto &container = std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second);
-        container.push_back(static_cast<Method<World, void, ARGS...>>(&World::executeMethod<T, M, ARGS...>));
+        std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethod<T, M, ARGS...>);
     }
 
     template<typename T, auto M, typename ... ARGS>
