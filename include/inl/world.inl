@@ -92,25 +92,59 @@ namespace engine
         unregisterCustomMethods<T>(this);
     }
 
-    template<typename T, auto M, typename ... ARGS>
+    template<typename T, auto M>
     void World::registerCustomMethod(std::size_t id)
     {
-        auto methods = _custom_methods.find(id);
+        auto methods = _custom_methods_without_args.find(id);
 
-        if (methods == _custom_methods.end()) {
-            _custom_methods.insert({id, MethodContainer<World, void, ARGS...>()});
-            methods = _custom_methods.find(id);
+        if (methods == _custom_methods_without_args.end()) {
+            _custom_methods_without_args.insert({id, MethodContainer<World, void>()});
+            methods = _custom_methods_without_args.find(id);
+        }
+
+        methods->second.push_back(&World::executeMethod<T, M>);
+    }
+
+    template<typename T, auto M>
+    void World::unregisterCustomMethod(std::size_t id)
+    {
+        auto methods = _custom_methods_without_args.find(id);
+
+        if (methods == _custom_methods_without_args.end())
+            return;
+
+        methods->second.erase(
+            std::remove_if(methods->second.begin(), methods->second.end(),
+                [&](Method<World, void> method) {
+                    return method == &World::executeMethod<T, M>;
+                }
+            ),
+            methods->second.end()
+        );
+
+        if (!methods->second.size())
+            _custom_methods_without_args.erase(methods);
+    }
+
+    template<typename T, auto M, typename ... ARGS>
+    std::enable_if_t<(sizeof...(ARGS) > 0), void> World::registerCustomMethod(std::size_t id)
+    {
+        auto methods = _custom_methods_with_args.find(id);
+
+        if (methods == _custom_methods_with_args.end()) {
+            _custom_methods_with_args.insert({id, MethodContainer<World, void, ARGS...>()});
+            methods = _custom_methods_with_args.find(id);
         }
 
         std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethod<T, M, ARGS...>);
     }
 
     template<typename T, auto M, typename ... ARGS>
-    void World::unregisterCustomMethod(std::size_t id)
+    std::enable_if_t<(sizeof...(ARGS) > 0), void> World::unregisterCustomMethod(std::size_t id)
     {
-        auto methods = _custom_methods.find(id);
+        auto methods = _custom_methods_with_args.find(id);
 
-        if (methods == _custom_methods.end())
+        if (methods == _custom_methods_with_args.end())
             return;
 
         MethodContainer<World, void, ARGS...> &container = std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second);
@@ -119,20 +153,21 @@ namespace engine
             std::remove_if(container.begin(), container.end(),
                 [&](Method<World, void, ARGS...> method) {
                     return method == &World::executeMethod<T, M, ARGS...>;
-                }),
+                }
+            ),
             container.end()
         );
 
         if (!container.size())
-            _custom_methods.erase(methods);
+            _custom_methods_with_args.erase(methods);
     }
 
     template<typename ... ARGS>
     void World::launchCustomMethod(std::size_t id, ARGS &&... args)
     {
-        auto methods = _custom_methods.find(id);
+        auto methods = _custom_methods_with_args.find(id);
 
-        if (methods == _custom_methods.end())
+        if (methods == _custom_methods_with_args.end())
             return;
 
         for (auto &method: std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second))

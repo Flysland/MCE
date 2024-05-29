@@ -69,4 +69,10 @@ namespace engine
         _worlds.push_back(new World(_current_world_id++));
         return _worlds.back();
     }
+
+    void Scene::launchCustomMethod(std::size_t id)
+    {
+        for (World *&world: _worlds)
+            world->launchCustomMethod(id);
+    }
 }

@@ -17,7 +17,8 @@ namespace engine
         , _remove_component_requests()
         , _destroy_entity_requests()
         , _remove_component_methods()
-        , _custom_methods()
+        , _custom_methods_with_args()
+        , _custom_methods_without_args()
     { }
 
     World::World(const World &other)
@@ -28,7 +29,8 @@ namespace engine
         , _remove_component_requests(other._remove_component_requests)
         , _destroy_entity_requests(other._destroy_entity_requests)
         , _remove_component_methods(other._remove_component_methods)
-        , _custom_methods(other._custom_methods)
+        , _custom_methods_with_args(other._custom_methods_with_args)
+        , _custom_methods_without_args(other._custom_methods_without_args)
     { }
 
     World::World(World &&other)
@@ -39,7 +41,8 @@ namespace engine
         , _remove_component_requests(other._remove_component_requests)
         , _destroy_entity_requests(other._destroy_entity_requests)
         , _remove_component_methods(other._remove_component_methods)
-        , _custom_methods(other._custom_methods)
+        , _custom_methods_with_args(other._custom_methods_with_args)
+        , _custom_methods_without_args(other._custom_methods_without_args)
     { }
 
     World::~World()
@@ -54,7 +57,8 @@ namespace engine
         _remove_component_requests = other._remove_component_requests;
         _destroy_entity_requests = other._destroy_entity_requests;
         _remove_component_methods = other._remove_component_methods;
-        _custom_methods = other._custom_methods;
+        _custom_methods_with_args = other._custom_methods_with_args;
+        _custom_methods_without_args = other._custom_methods_without_args;
 
         return *this;
     }
@@ -68,7 +72,8 @@ namespace engine
         _remove_component_requests = other._remove_component_requests;
         _destroy_entity_requests = other._destroy_entity_requests;
         _remove_component_methods = other._remove_component_methods;
-        _custom_methods = other._custom_methods;
+        _custom_methods_with_args = other._custom_methods_with_args;
+        _custom_methods_without_args = other._custom_methods_without_args;
 
         return *this;
     }
@@ -103,5 +108,16 @@ namespace engine
 
         _remove_component_requests.clear();
         _destroy_entity_requests.clear();
+    }
+
+    void World::launchCustomMethod(std::size_t id)
+    {
+        auto methods = _custom_methods_without_args.find(id);
+
+        if (methods == _custom_methods_without_args.end())
+            return;
+
+        for (auto &method: methods->second)
+            (this->*method)();
     }
 }
