@@ -18,9 +18,9 @@ INCLUDE =\
 	-I./include/\
 
 OBJ = ${SRC:${SRC_PATH}/%${FILE_TYPE}=${BUILD_PATH}/%.o}
-OBJ_FLAGS = -W -Wall -Wextra -Werror ${INCLUDE} -fPIC -std=c++20
-BIN_FLAGS = -shared
-BIN_NAME = libengine.so
+OBJ_FLAGS = -W -Wall -Wextra -Werror ${INCLUDE} -std=c++20
+BIN_FLAGS =
+BIN_NAME = engine.a
 
 all: ${BIN_NAME}
 
@@ -36,7 +36,7 @@ ${BUILD_PATH}/%.o: ${SRC_PATH}/%${FILE_TYPE}
 	${COMPILER} -MD ${OBJ_FLAGS} -c $< -o $@
 
 ${BIN_NAME}: ${OBJ}
-	${COMPILER} -o ${BIN_NAME} ${OBJ} ${BIN_FLAGS}
+	ar rc ${BIN_NAME} ${OBJ} ${BIN_FLAGS}
 
 clean:
 	rm -rf ${BUILD_PATH}

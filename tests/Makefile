@@ -20,7 +20,7 @@ INCLUDE =\
 
 OBJ = ${SRC:${SRC_PATH}/%${FILE_TYPE}=${BUILD_PATH}/%.o}
 OBJ_FLAGS = -g3 -DDEBUG -W -Wall -Wextra -Werror ${INCLUDE} -std=c++20
-BIN_FLAGS = -L../ -lengine
+BIN_FLAGS = ../engine.a
 BIN_NAME = tests_run
 
 all: ${BIN_NAME}
