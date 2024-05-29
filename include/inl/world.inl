@@ -103,7 +103,7 @@ namespace engine
         }
 
         auto &container = std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second);
-        container.push_back(static_cast<Method<World, void, ARGS...>>(&World::template executeMethod<T, M, ARGS...>));
+        container.push_back(static_cast<Method<World, void, ARGS...>>(&World::executeMethod<T, M, ARGS...>));
     }
 
     template<typename T, auto M, typename ... ARGS>
