@@ -25,6 +25,7 @@ namespace engine
 
             void destroyWorld(World *world);
             World *createWorld();
+            void launchCustomMethod(std::size_t id);
 
             inline void applyRequests();
 

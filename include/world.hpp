@@ -47,11 +47,17 @@ namespace engine
             template<typename T>
             void unregisterComponent();
 
-            template<typename T, auto M, typename ... ARGS>
+            template<typename T, auto M>
             void registerCustomMethod(std::size_t id);
 
-            template<typename T, auto M, typename ... ARGS>
+            template<typename T, auto M>
             void unregisterCustomMethod(std::size_t id);
+
+            template<typename T, auto M, typename ... ARGS>
+            std::enable_if_t<(sizeof...(ARGS) > 0), void> registerCustomMethod(std::size_t id);
+
+            template<typename T, auto M, typename ... ARGS>
+            std::enable_if_t<(sizeof...(ARGS) > 0), void> unregisterCustomMethod(std::size_t id);
 
         private:
             std::size_t _id;
@@ -61,11 +67,13 @@ namespace engine
             RequestContainer<Entity, World, void, const Entity &> _remove_component_requests;
             RequestContainer<Entity, World, void, const Entity &> _destroy_entity_requests;
             MethodContainer<World, void, const Entity &> _remove_component_methods;
-            std::unordered_map<std::size_t, std::any> _custom_methods;
+            std::unordered_map<std::size_t, std::any> _custom_methods_with_args;
+            std::unordered_map<std::size_t, MethodContainer<World, void>> _custom_methods_without_args;
 
             World(std::size_t id);
 
             void applyRequests();
+            void launchCustomMethod(std::size_t id);
 
             template<typename ... ARGS>
             void launchCustomMethod(std::size_t id, ARGS &&... args);
