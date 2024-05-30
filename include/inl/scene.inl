@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "engine/scene.hpp"
+#include "mce/scene.hpp"
 
-namespace engine
+namespace mce
 {
     inline void Scene::applyRequests()
     {

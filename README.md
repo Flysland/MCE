@@ -19,24 +19,24 @@ make tests_run
 ## Usage
 Firstly you need to create a ``scene`` object:
 ```cpp
-engine::Scene scene = engine::Scene();
+mce::Scene scene = mce::Scene();
 ```
 
 With that scene, you can create and delete some worlds:
 ```c++
-engine::World *world = scene.createWorld();
+mce::World *world = scene.createWorld();
 scene.destroyWorld(world);
 ```
 
 All entities objects is stored inside a world:
 ```cpp
-engine::Entity entity = world->createEntity();
+mce::Entity entity = world->createEntity();
 ```
 
 And you can access on their components:
 ```cpp
-engine::Component<int> &int_component = world->getComponent(entity);
-engine::Components<int> &int_components = world->getComponents();
+mce::Component<int> &int_component = world->getComponent(entity);
+mce::Components<int> &int_components = world->getComponents();
 world->removeComponent<int>(entity);
 ```
 
@@ -45,7 +45,7 @@ A component can be anything, a built-in types, or a structure/class that contain
 using ExampleComponent = struct ExampleComponent
 {
     // Called at the creation of the component
-    void init(engine::World *world, engine::Entity entity)
+    void init(mce::World *world, mce::Entity entity)
     { }
 };
 ```
@@ -61,9 +61,9 @@ void update(double delta_time);
 
 // Concept to check if the type contain the 'update' method
 template<typename T>
-concept HasUpdate = engine::HasCustomMethod<T, &T::update, double>;
+concept HasUpdate = mce::HasCustomMethod<T, &T::update, double>;
 
-namespace engine
+namespace mce
 {
     // Register all custom methods (it called when we register a new component)
     template<typename T>

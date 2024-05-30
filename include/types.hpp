@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <typeindex>
 
-namespace engine
+namespace mce
 {
     class World;
 

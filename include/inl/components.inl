@@ -5,9 +5,9 @@
 //
 ////////////////////////
 
-#include "engine/components.hpp"
+#include "mce/components.hpp"
 
-namespace engine
+namespace mce
 {
     template<typename T>
     Components<T>::Components()

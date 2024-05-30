@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "engine/types.hpp"
+#include "mce/types.hpp"
 
-namespace engine
+namespace mce
 {
     template<typename T>
     class Components
@@ -54,4 +54,4 @@ namespace engine
     };
 }
 
-#include "engine/inl/components.inl"
+#include "mce/inl/components.inl"
