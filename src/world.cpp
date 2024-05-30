@@ -5,9 +5,9 @@
 //
 ////////////////////////
 
-#include "engine/world.hpp"
+#include "mce/world.hpp"
 
-namespace engine
+namespace mce
 {
     World::World(std::size_t id)
         : _id(id)

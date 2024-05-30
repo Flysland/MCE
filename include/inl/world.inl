@@ -6,9 +6,9 @@
 ////////////////////////
 
 #include <algorithm>
-#include "engine/world.hpp"
+#include "mce/world.hpp"
 
-namespace engine
+namespace mce
 {
     inline const std::size_t &World::getID() const
     {

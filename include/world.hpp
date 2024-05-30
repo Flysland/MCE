@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "engine/types.hpp"
-#include "engine/components.hpp"
+#include "mce/types.hpp"
+#include "mce/components.hpp"
 
-namespace engine
+namespace mce
 {
     class World
     {

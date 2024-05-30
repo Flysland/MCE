@@ -13,9 +13,9 @@ namespace testing
     {
         INIT_TEST()
 
-        engine::Scene scene = engine::Scene();
-        engine::World *world_1 = scene.createWorld();
-        engine::World *world_2 = scene.createWorld();
+        mce::Scene scene = mce::Scene();
+        mce::World *world_1 = scene.createWorld();
+        mce::World *world_2 = scene.createWorld();
         std::size_t world_1_id = world_1->getID();
 
         CHECK(world_1 != world_2)

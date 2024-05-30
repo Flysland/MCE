@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "engine/types.hpp"
-#include "engine/world.hpp"
+#include "mce/types.hpp"
+#include "mce/world.hpp"
 
-namespace engine
+namespace mce
 {
     class Scene
     {

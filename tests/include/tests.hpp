@@ -8,7 +8,7 @@
 #pragma once
 
 #include <iostream>
-#include "engine/engine.hpp"
+#include "mce/engine.hpp"
 
 #define INIT_COUNTER(X, V) std::size_t X = V;
 #define INIT_STR(X, V) std::string X = V;
@@ -41,15 +41,15 @@
 #define REFERENCE_CUSTOM_METHOD_ID 2
 
 template<typename T>
-concept HasUpdate = engine::HasCustomMethod<T, &T::update>;
+concept HasUpdate = mce::HasCustomMethod<T, &T::update>;
 
 template<typename T>
-concept HasUpdateWithParam = engine::HasCustomMethod<T, &T::updateWithParam, int>;
+concept HasUpdateWithParam = mce::HasCustomMethod<T, &T::updateWithParam, int>;
 
 template<typename T>
-concept HasReferenceCustomMethod = engine::HasCustomMethod<T, &T::referenceMethod, int &>;
+concept HasReferenceCustomMethod = mce::HasCustomMethod<T, &T::referenceMethod, int &>;
 
-namespace engine
+namespace mce
 {
     template<typename T>
     void registerCustomMethods(World *world)

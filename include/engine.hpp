@@ -7,6 +7,6 @@
 
 #pragma once
 
-#include "engine/types.hpp"
-#include "engine/world.hpp"
-#include "engine/scene.hpp"
+#include "mce/types.hpp"
+#include "mce/world.hpp"
+#include "mce/scene.hpp"

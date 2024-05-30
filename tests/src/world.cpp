@@ -12,8 +12,8 @@ namespace testing
     using TestComponentInit = struct TestComponentInit
     {
         bool init_called;
-        engine::World *world;
-        engine::Entity entity;
+        mce::World *world;
+        mce::Entity entity;
 
         TestComponentInit()
             : init_called(false)
@@ -21,7 +21,7 @@ namespace testing
             , entity()
         { }
 
-        void init(engine::World *world, engine::Entity entity)
+        void init(mce::World *world, mce::Entity entity)
         {
             init_called = true;
             this->world = world;
@@ -61,10 +61,10 @@ namespace testing
     void test_entities()
     {
         INIT_TEST()
-        engine::Scene scene = engine::Scene();
-        engine::World *world = scene.createWorld();
-        engine::Entity entity_1 = world->createEntity();
-        engine::Entity entity_2 = world->createEntity();
+        mce::Scene scene = mce::Scene();
+        mce::World *world = scene.createWorld();
+        mce::Entity entity_1 = world->createEntity();
+        mce::Entity entity_2 = world->createEntity();
 
         CHECK(entity_1 != entity_2)
 
@@ -81,10 +81,10 @@ namespace testing
     void test_components()
     {
         INIT_TEST()
-        engine::Scene scene = engine::Scene();
-        engine::World *world = scene.createWorld();
-        engine::Entity entity = world->createEntity();
-        engine::Entity entity2 = world->createEntity();
+        mce::Scene scene = mce::Scene();
+        mce::World *world = scene.createWorld();
+        mce::Entity entity = world->createEntity();
+        mce::Entity entity2 = world->createEntity();
 
         CHECK(!world->getComponent<int>(entity).has_value())
 
