@@ -1,4 +1,6 @@
-# game-engine
+# MCE
+
+MCE (Modular Core Engine) is an engine to handle a huge amount of entities.
 
 ## Installation
 Compile the lib
