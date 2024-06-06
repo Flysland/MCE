@@ -41,10 +41,10 @@ namespace mce
             Entity _entity_start;
             Entity _entity_end;
 
-            Component<T> &insert_front(const Entity &entity);
-            Component<T> &insert_back(const Entity &entity);
-            void optimize_front();
-            void optimize_back();
+            Component<T> &insertFront(const Entity &entity);
+            Component<T> &insertBack(const Entity &entity);
+            void optimizeFront();
+            void optimizeBack();
     };
 }
 
