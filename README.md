@@ -3,67 +3,67 @@
 MCE (Modular Core Engine) is an engine to handle a huge amount of entities.
 
 ## Installation
-Compile the lib
-```sh
-make
+To compile the project
+```
+cmake -S . -B build
+make -C build
 ```
 
-Compile on debug mode
-```sh
-make debug
+To compile on debug mode
+```
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+make -C build
 ```
 
-Compile and launch tests
-```sh
-make tests_run
-```
+The compilation generate 2 folders:
+- bin (that contain all binaries compiled)
+- lib (that contain all libraries compiled)
 
 ## Usage
-Firstly you need to create a ``scene`` object:
+MCE use an Entity-Components architecture. An entity can be anything (ex: the player, an enemy, a weapon or an invisible thing like a trigger...). To determine what is the entity, we append to it some components. For example, to create the player entity, we can add this components:
+- PlayerMovement (handle inputs to move the player)
+- Renderer (display the graphics for the player)
+- Collider (interact with other entities)
+- ...
+
+> :warning: On MCE, you can add only ONE component type per entity :warning:
+
+Example to create a player entity with MCE
 ```cpp
-mce::Scene scene = mce::Scene();
+// A world store all entities
+mce::World world = mce::World();
+
+// We create the player entity
+mce::Entity player = world.createEntity();
+
+// We add some components on the player
+world.addComponent<PlayerMovement>(player);
+world.addComponent<Renderer>(player);
+world.addComponent<Collider>(player);
 ```
 
-With that scene, you can create and delete some worlds:
-```c++
-mce::World *world = scene.createWorld();
-scene.destroyWorld(world);
-```
+Now we have the player entity.
+On many Game Engine, there are some specific methods inside the components to update it (ex: start, update, ...). On MCE, you define your own custom methods.
+For example we will define 2 custom methods:
+- physicUpdate -> called to update all physics components (ex: gravity, colliders, ...)
+- renderUpdate -> called to update all render components (ex: 3D model, text, ...)
 
-All entities objects is stored inside a world:
-```cpp
-mce::Entity entity = world->createEntity();
-```
+Only the ``physicUpdate`` methods take a single ``double`` parameter for the delta time between 2 frames. It can take any parameters.
 
-And you can access on their components:
 ```cpp
-mce::Component<int> &int_component = world->getComponent(entity);
-mce::Components<int> &int_components = world->getComponents();
-world->removeComponent<int>(entity);
-```
+// unique identifier for the 'physicUpdate' method.
+#define PHYSIC_UPDATE_METHOD_ID 0
 
-A component can be anything, a built-in types, or a structure/class that contain a special methods:
-```cpp
-using ExampleComponent = struct ExampleComponent
-{
-    // Called at the creation of the component
-    void init(mce::World *world, mce::Entity entity)
-    { }
-};
-```
+// unique identifier for the 'renderUpdate' method.
+#define RENDER_UPDATE_METHOD_ID 1
 
-You can register your own custom methods. A custom method is a method who can be called by the engine. There are only one rule to register it correctly. It must return ``void``.
-For example there is how we can register a method named ``update`` and it take a ``double`` parameter for the delta time. So their prototype is
-```cpp
-void update(double delta_time);
-```
-```cpp
-// unique identifier for the 'update' method. It must be an integer.
-#define UPDATE_METHOD_ID 0
-
-// Concept to check if the type contain the 'update' method
+// Concept to check if the type contain the 'physicUpdate' method
 template<typename T>
-concept HasUpdate = mce::HasCustomMethod<T, &T::update, double>;
+concept HasPhysicUpdate = mce::HasCustomMethod<T, &T::physicUpdate, double>;
+
+// Concept to check if the type contain the 'renderUpdate' method
+template<typename T>
+concept HasRenderUpdate = mce::HasCustomMethod<T, &T::renderUpdate>;
 
 namespace mce
 {
@@ -71,25 +71,41 @@ namespace mce
     template<typename T>
     void registerCustomMethods(World *world)
     {
-        // Check if the type contain the 'update' method
-        if constexpr(HasUpdate<T>)
-            // Register the 'update' method
-            world->registerCustomMethod<T, &T::update, double>(UPDATE_METHOD_ID);
+        // Check if the type contain the 'physicUpdate' method
+        if constexpr(HasPhysicUpdate<T>)
+            // Register the 'physicUpdate' method
+            world->registerCustomMethod<T, &T::physicUpdate, double>(PHYSIC_UPDATE_METHOD_ID);
+
+        // Check if the type contain the 'renderUpdate' method
+        if constexpr(HasRenderUpdate<T>)
+            // Register the 'renderUpdate' method
+            world->registerCustomMethod<T, &T::renderUpdate>(RENDER_UPDATE_METHOD_ID);
     }
 
     // Unregister all custom methods (it called when we unregister a component)
     template<typename T>
     void unregisterCustomMethods(World *world)
     {
-        // Check if the type contain the 'update' method
-        if constexpr(HasUpdate<T>)
-            // Unregister the 'update' method
-            world->unregisterCustomMethod<T, &T::update, double>(UPDATE_METHOD_ID);
+        // Check if the type contain the 'physicUpdate' method
+        if constexpr(HasPhysicUpdate<T>)
+            // Unregister the 'physicUpdate' method
+            world->unregisterCustomMethod<T, &T::physicUpdate, double>(PHYSIC_UPDATE_METHOD_ID);
+
+        // Check if the type contain the 'renderUpdate' method
+        if constexpr(HasRenderUpdate<T>)
+            // Register the 'renderUpdate' method
+            world->registerCustomMethod<T, &T::renderUpdate>(RENDER_UPDATE_METHOD_ID);
     }
 }
+
 ```
-We can now call this method like this:
+
+Now we can call the custom methods
+
 ```cpp
-scene.launchCustomMethod(UPDATE_METHOD_ID, 3.14);
+// Call the 'physicUpdate' method on all components that contain the method
+world.launchCustomMethod(PHYSIC_UPDATE_METHOD_ID, 3.14);
+
+// Call the 'renderUpdate' method on all components that contain the method
+world.launchCustomMethod(RENDER_UPDATE_METHOD_ID);
 ```
-It execute the ``update`` method on all components in order of component registration.
