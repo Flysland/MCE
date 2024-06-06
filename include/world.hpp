@@ -14,20 +14,17 @@ namespace mce
 {
     class World
     {
-        friend class Scene;
-
         public:
-            World(const World &other);
-            World(World &&other);
-            ~World();
-
-            World &operator=(const World &other);
-            World &operator=(World &&other);
+            World();
 
             Entity createEntity();
             void requestDestroyEntity(const Entity &entity);
 
-            inline const std::size_t &getID() const;
+            void applyRequests();
+            void launchCustomMethod(std::size_t id);
+
+            template<typename ... ARGS>
+            void launchCustomMethod(std::size_t id, ARGS &&... args);
 
             template<typename T, typename ... ARGS>
             Component<T> &addComponent(const Entity &entity, ARGS &&... args);
@@ -60,7 +57,6 @@ namespace mce
             std::enable_if_t<(sizeof...(ARGS) > 0), void> unregisterCustomMethod(std::size_t id);
 
         private:
-            std::size_t _id;
             Entity _current_entity;
             Entities _available_entities;
             ComponentContainer _components;
@@ -69,14 +65,6 @@ namespace mce
             MethodContainer<World, void, const Entity &> _remove_component_methods;
             std::unordered_map<std::size_t, std::any> _custom_methods_with_args;
             std::unordered_map<std::size_t, MethodContainer<World, void>> _custom_methods_without_args;
-
-            World(std::size_t id);
-
-            void applyRequests();
-            void launchCustomMethod(std::size_t id);
-
-            template<typename ... ARGS>
-            void launchCustomMethod(std::size_t id, ARGS &&... args);
 
             inline void destroyEntity(const Entity &entity);
 

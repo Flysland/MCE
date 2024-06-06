@@ -80,7 +80,6 @@ namespace mce
 
 namespace testing
 {
-    void test_scene();
     void test_entities();
     void test_components();
 }

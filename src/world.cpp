@@ -9,9 +9,8 @@
 
 namespace mce
 {
-    World::World(std::size_t id)
-        : _id(id)
-        , _current_entity(0)
+    World::World()
+        : _current_entity(0)
         , _available_entities()
         , _components()
         , _remove_component_requests()
@@ -20,63 +19,6 @@ namespace mce
         , _custom_methods_with_args()
         , _custom_methods_without_args()
     { }
-
-    World::World(const World &other)
-        : _id(other._id)
-        , _current_entity(other._current_entity)
-        , _available_entities(other._available_entities)
-        , _components(other._components)
-        , _remove_component_requests(other._remove_component_requests)
-        , _destroy_entity_requests(other._destroy_entity_requests)
-        , _remove_component_methods(other._remove_component_methods)
-        , _custom_methods_with_args(other._custom_methods_with_args)
-        , _custom_methods_without_args(other._custom_methods_without_args)
-    { }
-
-    World::World(World &&other)
-        : _id(other._id)
-        , _current_entity(other._current_entity)
-        , _available_entities(other._available_entities)
-        , _components(other._components)
-        , _remove_component_requests(other._remove_component_requests)
-        , _destroy_entity_requests(other._destroy_entity_requests)
-        , _remove_component_methods(other._remove_component_methods)
-        , _custom_methods_with_args(other._custom_methods_with_args)
-        , _custom_methods_without_args(other._custom_methods_without_args)
-    { }
-
-    World::~World()
-    { }
-
-    World &World::operator=(const World &other)
-    {
-        _id = other._id;
-        _current_entity = other._current_entity;
-        _available_entities = other._available_entities;
-        _components = other._components;
-        _remove_component_requests = other._remove_component_requests;
-        _destroy_entity_requests = other._destroy_entity_requests;
-        _remove_component_methods = other._remove_component_methods;
-        _custom_methods_with_args = other._custom_methods_with_args;
-        _custom_methods_without_args = other._custom_methods_without_args;
-
-        return *this;
-    }
-
-    World &World::operator=(World &&other)
-    {
-        _id = other._id;
-        _current_entity = other._current_entity;
-        _available_entities = other._available_entities;
-        _components = other._components;
-        _remove_component_requests = other._remove_component_requests;
-        _destroy_entity_requests = other._destroy_entity_requests;
-        _remove_component_methods = other._remove_component_methods;
-        _custom_methods_with_args = other._custom_methods_with_args;
-        _custom_methods_without_args = other._custom_methods_without_args;
-
-        return *this;
-    }
 
     Entity World::createEntity()
     {

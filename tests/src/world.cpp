@@ -21,10 +21,10 @@ namespace testing
             , entity()
         { }
 
-        void init(mce::World *world, mce::Entity entity)
+        void init(mce::World &world, mce::Entity entity)
         {
             init_called = true;
-            this->world = world;
+            this->world = &world;
             this->entity = entity;
         }
     };
@@ -61,17 +61,16 @@ namespace testing
     void test_entities()
     {
         INIT_TEST()
-        mce::Scene scene = mce::Scene();
-        mce::World *world = scene.createWorld();
-        mce::Entity entity_1 = world->createEntity();
-        mce::Entity entity_2 = world->createEntity();
+        mce::World world = mce::World();
+        mce::Entity entity_1 = world.createEntity();
+        mce::Entity entity_2 = world.createEntity();
 
         CHECK(entity_1 != entity_2)
 
-        world->requestDestroyEntity(entity_1);
-        scene.applyRequests();
+        world.requestDestroyEntity(entity_1);
+        world.applyRequests();
 
-        entity_1 = world->createEntity();
+        entity_1 = world.createEntity();
 
         CHECK(entity_1 != entity_2)
 
@@ -81,57 +80,56 @@ namespace testing
     void test_components()
     {
         INIT_TEST()
-        mce::Scene scene = mce::Scene();
-        mce::World *world = scene.createWorld();
-        mce::Entity entity = world->createEntity();
-        mce::Entity entity2 = world->createEntity();
+        mce::World world = mce::World();
+        mce::Entity entity = world.createEntity();
+        mce::Entity entity2 = world.createEntity();
 
-        CHECK(!world->getComponent<int>(entity).has_value())
+        CHECK(!world.getComponent<int>(entity).has_value())
 
-        world->addComponent<int>(entity, 42);
+        world.addComponent<int>(entity, 42);
 
-        CHECK(world->getComponent<int>(entity).has_value())
-        CHECK(world->getComponent<int>(entity).value() == 42)
-        CHECK(world->getComponents<int>().size() == 1)
+        CHECK(world.getComponent<int>(entity).has_value())
+        CHECK(world.getComponent<int>(entity).value() == 42)
+        CHECK(world.getComponents<int>().size() == 1)
 
-        world->addComponent<int>(entity2, 84);
+        world.addComponent<int>(entity2, 84);
 
-        CHECK(world->getComponent<int>(entity2).has_value())
-        CHECK(world->getComponent<int>(entity2).value() == 84)
-        CHECK(world->getComponents<int>().size() == 2)
+        CHECK(world.getComponent<int>(entity2).has_value())
+        CHECK(world.getComponent<int>(entity2).value() == 84)
+        CHECK(world.getComponents<int>().size() == 2)
 
-        world->requestRemoveComponent<int>(entity);
-        scene.applyRequests();
+        world.requestRemoveComponent<int>(entity);
+        world.applyRequests();
 
-        CHECK(!world->getComponent<int>(entity).has_value())
-        CHECK(world->getComponent<int>(entity2).has_value())
-        CHECK(world->getComponent<int>(entity2).value() == 84)
-        CHECK(world->getComponents<int>().size() == 1)
+        CHECK(!world.getComponent<int>(entity).has_value())
+        CHECK(world.getComponent<int>(entity2).has_value())
+        CHECK(world.getComponent<int>(entity2).value() == 84)
+        CHECK(world.getComponents<int>().size() == 1)
 
-        world->addComponent<TestComponentInit>(entity);
+        world.addComponent<TestComponentInit>(entity);
 
-        CHECK(world->getComponent<TestComponentInit>(entity)->init_called)
-        CHECK(world->getComponent<TestComponentInit>(entity)->world == world)
-        CHECK(world->getComponent<TestComponentInit>(entity)->entity == entity)
+        CHECK(world.getComponent<TestComponentInit>(entity)->init_called)
+        CHECK(world.getComponent<TestComponentInit>(entity)->world == &world)
+        CHECK(world.getComponent<TestComponentInit>(entity)->entity == entity)
 
-        world->addComponent<TestComponentUpdate>(entity);
+        world.addComponent<TestComponentUpdate>(entity);
 
-        CHECK(!world->getComponent<TestComponentUpdate>(entity)->update_called);
-        CHECK(world->getComponent<TestComponentUpdate>(entity)->a == 0);
-        CHECK(world->getComponent<TestComponentUpdate>(entity)->ptr == nullptr);
+        CHECK(!world.getComponent<TestComponentUpdate>(entity)->update_called);
+        CHECK(world.getComponent<TestComponentUpdate>(entity)->a == 0);
+        CHECK(world.getComponent<TestComponentUpdate>(entity)->ptr == nullptr);
 
-        scene.launchCustomMethod(UPDATE_METHOD_ID);
+        world.launchCustomMethod(UPDATE_METHOD_ID);
 
-        CHECK(world->getComponent<TestComponentUpdate>(entity)->update_called);
+        CHECK(world.getComponent<TestComponentUpdate>(entity)->update_called);
 
-        scene.launchCustomMethod(UPDATE_WITH_PARAM_METHOD_ID, 42);
+        world.launchCustomMethod(UPDATE_WITH_PARAM_METHOD_ID, 42);
 
-        CHECK(world->getComponent<TestComponentUpdate>(entity)->a == 42);
+        CHECK(world.getComponent<TestComponentUpdate>(entity)->a == 42);
 
         int value = 42;
-        scene.launchCustomMethod(REFERENCE_CUSTOM_METHOD_ID, value);
+        world.launchCustomMethod(REFERENCE_CUSTOM_METHOD_ID, value);
 
-        CHECK(world->getComponent<TestComponentUpdate>(entity)->ptr == &value);
+        CHECK(world.getComponent<TestComponentUpdate>(entity)->ptr == &value);
         CHECK(value == 12);
         TERMINATE_TEST()
     }
