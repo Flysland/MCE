@@ -17,44 +17,6 @@ namespace mce
     { }
 
     template<typename T>
-    Components<T>::Components(const Components<T> &other)
-        : _components(other._components)
-        , _entity_start(other._entity_start)
-        , _entity_end(other._entity_end)
-    { }
-
-    template<typename T>
-    Components<T>::Components(Components<T> &&other)
-        : _components(other._components)
-        , _entity_start(other._entity_start)
-        , _entity_end(other._entity_end)
-    { }
-
-    template<typename T>
-    Components<T>::~Components()
-    { }
-
-    template<typename T>
-    Components<T> &Components<T>::operator=(const Components<T> &other)
-    {
-        _components = other._components;
-        _entity_start = other._entity_start;
-        _entity_end = other._entity_end;
-
-        return *this;
-    }
-
-    template<typename T>
-    Components<T> &Components<T>::operator=(Components<T> &&other)
-    {
-        _components = other._components;
-        _entity_start = other._entity_start;
-        _entity_end = other._entity_end;
-
-        return *this;
-    }
-
-    template<typename T>
     inline std::size_t Components<T>::size() const
     {
         return _components.size();
