@@ -9,4 +9,3 @@
 
 #include "mce/types.hpp"
 #include "mce/world.hpp"
-#include "mce/scene.hpp"

@@ -10,11 +10,6 @@
 
 namespace mce
 {
-    inline const std::size_t &World::getID() const
-    {
-        return _id;
-    }
-
     template<typename T, typename ... ARGS>
     Component<T> &World::addComponent(const Entity &entity, ARGS &&... args)
     {
@@ -28,7 +23,7 @@ namespace mce
         components.get(entity).emplace(std::forward<ARGS>(args)...);
 
         if constexpr(HasInit<T>)
-            components.get(entity)->init(this, entity);
+            components.get(entity)->init(*this, entity);
 
         return components.get(entity);
     }

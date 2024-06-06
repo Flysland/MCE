@@ -44,5 +44,5 @@ namespace mce
     concept HasCustomMethod = HasMethod<T, M, void, ARGS...>;
 
     template<typename T>
-    concept HasInit = HasCustomMethod<T, &T::init, World *, const Entity &>;
+    concept HasInit = HasCustomMethod<T, &T::init, World &, const Entity &>;
 }
