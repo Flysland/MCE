@@ -55,8 +55,8 @@ namespace mce
     template<typename T>
     inline void Components<T>::optimize()
     {
-        optimize_front();
-        optimize_back();
+        optimizeFront();
+        optimizeBack();
     }
 
     template<typename T>
@@ -71,13 +71,13 @@ namespace mce
     Component<T> &Components<T>::insert_entity(const Entity &entity)
     {
         if (entity < _entity_start)
-            return insert_front(entity);
+            return insertFront(entity);
 
         if (entity > _entity_end)
-            return insert_back(entity);
+            return insertBack(entity);
 
         if (entity == 0 && _entity_start == 0)
-            return insert_front(entity);
+            return insertFront(entity);
 
         return get(entity);
     }
@@ -127,7 +127,7 @@ namespace mce
     }
 
     template<typename T>
-    Component<T> &Components<T>::insert_front(const Entity &entity)
+    Component<T> &Components<T>::insertFront(const Entity &entity)
     {
         if (!_components.size())
             _entity_end = entity;
@@ -139,7 +139,7 @@ namespace mce
     }
 
     template<typename T>
-    Component<T> &Components<T>::insert_back(const Entity &entity)
+    Component<T> &Components<T>::insertBack(const Entity &entity)
     {
         if (!_components.size())
             _entity_start = entity;
@@ -151,7 +151,7 @@ namespace mce
     }
 
     template<typename T>
-    void Components<T>::optimize_front()
+    void Components<T>::optimizeFront()
     {
         std::size_t index = 0;
 
@@ -170,7 +170,7 @@ namespace mce
     }
 
     template<typename T>
-    void Components<T>::optimize_back()
+    void Components<T>::optimizeBack()
     {
         std::size_t index = _components.size() - 1;
 
