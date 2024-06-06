@@ -1,5 +1,5 @@
 build
 vgcore.*
-libmce.so
-tests_run
 .vscode
+lib
+bin
