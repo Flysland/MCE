@@ -21,10 +21,10 @@ namespace mce
             void requestDestroyEntity(const Entity &entity);
 
             void applyRequests();
-            void launchCustomMethod(std::size_t id);
+            bool launchCustomMethod(std::size_t id);
 
             template<typename ... ARGS>
-            void launchCustomMethod(std::size_t id, ARGS &&... args);
+            bool launchCustomMethod(std::size_t id, ARGS &&... args);
 
             template<typename T, typename ... ARGS>
             T *addComponent(const Entity &entity, ARGS &&... args);

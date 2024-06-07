@@ -164,15 +164,17 @@ namespace mce
     }
 
     template<typename ... ARGS>
-    void World::launchCustomMethod(std::size_t id, ARGS &&... args)
+    bool World::launchCustomMethod(std::size_t id, ARGS &&... args)
     {
         auto methods = _custom_methods_with_args.find(id);
 
         if (methods == _custom_methods_with_args.end())
-            return;
+            return false;
 
         for (auto &method: std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second))
             (this->*method)(std::forward<ARGS>(args)...);
+
+        return true;
     }
 
     inline void World::destroyEntity(const Entity &entity)
@@ -214,7 +216,7 @@ namespace mce
         }
         threads.emplace_back(worker, it, end);
 
-        for (std::thread &t : threads)
+        for (std::thread &t: threads)
             t.join();
     }
 
