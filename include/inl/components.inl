@@ -12,9 +12,24 @@ namespace mce
     template<typename T>
     Components<T>::Components()
         : _components()
+        , _map()
         , _entity_start(0)
         , _entity_end(0)
     { }
+
+    template<typename T>
+    template<typename ... ARGS>
+    T *Components<T>::insert_entity(const Entity &entity, ARGS &&... args)
+    {
+        auto it = _map.find(entity);
+
+        if (it != _map.end())
+            return &_components[it->second];
+
+        _map.insert({entity, _components.size()});
+        _components.emplace_back(std::forward<ARGS>(args)...);
+        return &_components.back();
+    }
 
     template<typename T>
     inline std::size_t Components<T>::size() const
@@ -25,7 +40,7 @@ namespace mce
     template<typename T>
     inline bool Components<T>::contain(const Entity &entity) const
     {
-        return _entity_start <= entity && _entity_end >= entity;
+        return _map.find(entity) != _map.end();
     }
 
     template<typename T>
@@ -53,137 +68,66 @@ namespace mce
     }
 
     template<typename T>
-    inline void Components<T>::optimize()
-    {
-        optimizeFront();
-        optimizeBack();
-    }
-
-    template<typename T>
     void Components<T>::clear()
     {
         _components.clear();
+        _map.clear();
         _entity_start = 0;
         _entity_end = 0;
     }
 
     template<typename T>
-    Component<T> &Components<T>::insert_entity(const Entity &entity)
+    void Components<T>::remove(const Entity &entity)
     {
-        if (entity < _entity_start)
-            return insertFront(entity);
+        auto entity_it = _map.find(entity);
 
-        if (entity > _entity_end)
-            return insertBack(entity);
+        if (entity_it == _map.end())
+            return;
 
-        if (entity == 0 && _entity_start == 0)
-            return insertFront(entity);
+        for (auto it = std::next(entity_it); it != _map.end(); ++it)
+            it->second -= 1;
 
-        return get(entity);
+        _components.erase(_components.begin() + entity_it->second);
+        _map.erase(entity_it);
     }
 
     template<typename T>
-    Component<T> &Components<T>::at(std::size_t index)
+    T *Components<T>::at(std::size_t index)
     {
-        static Component<T> null_component = std::nullopt;
-
         if (size() <= index)
-            return null_component;
+            return nullptr;
 
-        return _components.at(index);
+        return &_components[index];
     }
 
     template<typename T>
-    const Component<T> &Components<T>::at(std::size_t index) const
+    const T *Components<T>::at(std::size_t index) const
     {
-        static Component<T> null_component = std::nullopt;
-
         if (size() <= index)
-            return null_component;
+            return nullptr;
 
-        return _components.at(index);
+        return &_components[index];
     }
 
     template<typename T>
-    Component<T> &Components<T>::get(const Entity &entity)
+    T *Components<T>::get(const Entity &entity)
     {
-        static Component<T> null_component = std::nullopt;
+        auto it = _map.find(entity);
 
-        if (entity < _entity_start || entity - _entity_start >= _components.size())
-            return null_component;
+        if (it == _map.end() || it->second >= _components.size())
+            return nullptr;
 
-        return _components.at(entity - _entity_start);
+        return &_components[it->second];
     }
 
     template<typename T>
-    const Component<T> &Components<T>::get(const Entity &entity) const
+    const T *Components<T>::get(const Entity &entity) const
     {
-        static Component<T> null_component = std::nullopt;
+        auto it = _map.find(entity);
 
-        if (entity < _entity_start || entity - _entity_start >= _components.size())
-            return null_component;
+        if (it == _map.end() || it->second >= _components.size())
+            return nullptr;
 
-        return _components.at(entity - _entity_start);
-    }
-
-    template<typename T>
-    Component<T> &Components<T>::insertFront(const Entity &entity)
-    {
-        if (!_components.size())
-            _entity_end = entity;
-
-        _components.insert(_components.begin(), _entity_end - entity + 1 - _components.size(), std::nullopt);
-        _entity_start = entity;
-
-        return _components.at(entity - _entity_start);
-    }
-
-    template<typename T>
-    Component<T> &Components<T>::insertBack(const Entity &entity)
-    {
-        if (!_components.size())
-            _entity_start = entity;
-
-        _components.resize(entity - _entity_start + 1);
-        _entity_end = entity;
-
-        return _components.at(entity - _entity_start);
-    }
-
-    template<typename T>
-    void Components<T>::optimizeFront()
-    {
-        std::size_t index = 0;
-
-        for (Component<T> &component: _components) {
-            if (component.has_value()) {
-                if (!index)
-                    return;
-
-                _components.erase(_components.begin(), _components.begin() + index);
-                _entity_start += index;
-                return;
-            }
-            ++index;
-        }
-        clear();
-    }
-
-    template<typename T>
-    void Components<T>::optimizeBack()
-    {
-        std::size_t index = _components.size() - 1;
-
-        for (auto it = _components.end(); it != _components.begin(); --it, --index) {
-            if (it->has_value()) {
-                if (index == _components.size() - 1)
-                    return;
-
-                _components.erase(it + 1, _components.end());
-                _entity_end = index;
-                return;
-            }
-        }
-        clear();
+        return &_components[it->second];
     }
 }

@@ -11,16 +11,14 @@
 namespace mce
 {
     template<typename T, typename ... ARGS>
-    Component<T> &World::addComponent(const Entity &entity, ARGS &&... args)
+    T *World::addComponent(const Entity &entity, ARGS &&... args)
     {
         Components<T> &components = getComponents<T>();
 
-        components.insert_entity(entity);
-
-        if (components.get(entity).has_value())
+        if (components.contain(entity))
             return components.get(entity);
 
-        components.get(entity).emplace(std::forward<ARGS>(args)...);
+        components.insert_entity(entity, std::forward<ARGS>(args)...);
 
         if constexpr(HasInit<T>)
             components.get(entity)->init(*this, entity);
@@ -35,7 +33,7 @@ namespace mce
     }
 
     template<typename T>
-    inline Component<T> &World::getComponent(const Entity &entity)
+    inline T *World::getComponent(const Entity &entity)
     {
         return getComponents<T>().get(entity);
     }
@@ -179,12 +177,8 @@ namespace mce
     {
         Components<T> &components = getComponents<T>();
 
-        for (Component<T> &component: components) {
-            if (!component.has_value())
-                continue;
-
-            (component.value().*M)(std::forward<ARGS>(args)...);
-        }
+        for (T &component: components)
+            (component.*M)(std::forward<ARGS>(args)...);
     }
 
     template<typename T>
@@ -192,10 +186,10 @@ namespace mce
     {
         Components<T> &components = getComponents<T>();
 
-        if (!components.contain(entity) || !components.get(entity).has_value())
+        if (!components.contain(entity))
             return;
 
-        components.get(entity).reset();
+        components.remove(entity);
         components.optimize();
 
         if (!components.size())
