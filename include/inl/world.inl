@@ -6,6 +6,8 @@
 ////////////////////////
 
 #include <algorithm>
+#include <thread>
+#include <iostream>
 #include "mce/world.hpp"
 
 namespace mce
@@ -86,7 +88,7 @@ namespace mce
     }
 
     template<typename T, auto M>
-    void World::registerCustomMethod(std::size_t id)
+    void World::registerCustomMethod(std::size_t id, bool threaded)
     {
         auto methods = _custom_methods_without_args.find(id);
 
@@ -95,7 +97,10 @@ namespace mce
             methods = _custom_methods_without_args.find(id);
         }
 
-        methods->second.push_back(&World::executeMethod<T, M>);
+        if (threaded)
+            methods->second.push_back(&World::executeMethodThreaded<T, M>);
+        else
+            methods->second.push_back(&World::executeMethod<T, M>);
     }
 
     template<typename T, auto M>
@@ -120,7 +125,7 @@ namespace mce
     }
 
     template<typename T, auto M, typename ... ARGS>
-    std::enable_if_t<(sizeof...(ARGS) > 0), void> World::registerCustomMethod(std::size_t id)
+    std::enable_if_t<(sizeof...(ARGS) > 0), void> World::registerCustomMethod(std::size_t id, bool threaded)
     {
         auto methods = _custom_methods_with_args.find(id);
 
@@ -129,7 +134,10 @@ namespace mce
             methods = _custom_methods_with_args.find(id);
         }
 
-        std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethod<T, M, ARGS...>);
+        if (threaded)
+            std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethodThreaded<T, M, ARGS...>);
+        else
+            std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethod<T, M, ARGS...>);
     }
 
     template<typename T, auto M, typename ... ARGS>
@@ -179,6 +187,35 @@ namespace mce
 
         for (T &component: components)
             (component.*M)(std::forward<ARGS>(args)...);
+    }
+
+    template<typename T, auto M, typename ... ARGS>
+    void World::executeMethodThreaded(ARGS &&... args)
+    {
+        Components<T> &components = getComponents<T>();
+        std::vector<std::thread> threads;
+        auto begin = components.begin();
+        auto end = components.end();
+        size_t hardware_threads = std::thread::hardware_concurrency();
+        size_t num_threads = hardware_threads != 0 ? hardware_threads : 2;
+        size_t block_size = components.size() / num_threads;
+
+        threads.reserve(num_threads);
+        auto worker = [&](typename Components<T>::iterator start, typename Components<T>::iterator end) {
+            for (auto it = start; it != end; ++it)
+                ((*it).*M)(std::forward<ARGS>(args)...);
+        };
+
+        auto it = begin;
+        for (size_t i = 0; i < num_threads - 1; ++i) {
+            auto block_end = std::next(it, block_size);
+            threads.emplace_back(worker, it, block_end);
+            it = block_end;
+        }
+        threads.emplace_back(worker, it, end);
+
+        for (std::thread &t : threads)
+            t.join();
     }
 
     template<typename T>
