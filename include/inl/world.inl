@@ -18,7 +18,7 @@ namespace mce
         if (components.contain(entity))
             return components.get(entity);
 
-        components.insert_entity(entity, std::forward<ARGS>(args)...);
+        components.insertEntity(entity, std::forward<ARGS>(args)...);
 
         if constexpr(HasInit<T>)
             components.get(entity)->init(*this, entity);

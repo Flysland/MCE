@@ -19,7 +19,7 @@ namespace mce
 
     template<typename T>
     template<typename ... ARGS>
-    T *Components<T>::insert_entity(const Entity &entity, ARGS &&... args)
+    T *Components<T>::insertEntity(const Entity &entity, ARGS &&... args)
     {
         auto it = _map.find(entity);
 

@@ -23,7 +23,7 @@ namespace mce
             Components();
 
             template<typename ... ARGS>
-            T *insert_entity(const Entity &entity, ARGS &&... args);
+            T *insertEntity(const Entity &entity, ARGS &&... args);
 
             inline std::size_t size() const;
             inline bool contain(const Entity &entity) const;
