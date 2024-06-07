@@ -190,7 +190,6 @@ namespace mce
             return;
 
         components.remove(entity);
-        components.optimize();
 
         if (!components.size())
             unregisterComponent<T>();
