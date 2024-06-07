@@ -84,26 +84,26 @@ namespace testing
         mce::Entity entity = world.createEntity();
         mce::Entity entity2 = world.createEntity();
 
-        CHECK(!world.getComponent<int>(entity).has_value())
+        CHECK(world.getComponent<int>(entity) == nullptr)
 
         world.addComponent<int>(entity, 42);
 
-        CHECK(world.getComponent<int>(entity).has_value())
-        CHECK(world.getComponent<int>(entity).value() == 42)
+        CHECK(world.getComponent<int>(entity) != nullptr)
+        CHECK(*world.getComponent<int>(entity) == 42)
         CHECK(world.getComponents<int>().size() == 1)
 
         world.addComponent<int>(entity2, 84);
 
-        CHECK(world.getComponent<int>(entity2).has_value())
-        CHECK(world.getComponent<int>(entity2).value() == 84)
+        CHECK(world.getComponent<int>(entity2) != nullptr)
+        CHECK(*world.getComponent<int>(entity2) == 84)
         CHECK(world.getComponents<int>().size() == 2)
 
         world.requestRemoveComponent<int>(entity);
         world.applyRequests();
 
-        CHECK(!world.getComponent<int>(entity).has_value())
-        CHECK(world.getComponent<int>(entity2).has_value())
-        CHECK(world.getComponent<int>(entity2).value() == 84)
+        CHECK(world.getComponent<int>(entity) == nullptr)
+        CHECK(world.getComponent<int>(entity2) != nullptr)
+        CHECK(*world.getComponent<int>(entity2) == 84)
         CHECK(world.getComponents<int>().size() == 1)
 
         world.addComponent<TestComponentInit>(entity);

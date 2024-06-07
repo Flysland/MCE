@@ -27,13 +27,13 @@ namespace mce
             void launchCustomMethod(std::size_t id, ARGS &&... args);
 
             template<typename T, typename ... ARGS>
-            Component<T> &addComponent(const Entity &entity, ARGS &&... args);
+            T *addComponent(const Entity &entity, ARGS &&... args);
 
             template<typename T>
             inline void requestRemoveComponent(const Entity &entity);
 
             template<typename T>
-            inline Component<T> &getComponent(const Entity &entity);
+            inline T *getComponent(const Entity &entity);
 
             template<typename T>
             Components<T> &getComponents();

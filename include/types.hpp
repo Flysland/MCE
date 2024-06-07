@@ -12,6 +12,7 @@
 #include <any>
 #include <optional>
 #include <unordered_map>
+#include <map>
 #include <typeindex>
 
 namespace mce
@@ -30,9 +31,6 @@ namespace mce
 
     template<typename T, typename R, typename ... ARGS>
     using MethodContainer = std::vector<Method<T, R, ARGS...>>;
-
-    template<typename T>
-    using Component = std::optional<T>;
 
     template<typename T, auto M, typename R, typename ... ARGS>
     concept HasMethod = requires(T &t, ARGS &&... args)

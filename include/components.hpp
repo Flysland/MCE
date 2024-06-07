@@ -15,11 +15,15 @@ namespace mce
     class Components
     {
         public:
-            using container = std::vector<Component<T>>;
+            using container = std::vector<T>;
             using iterator = container::iterator;
             using const_iterator = container::const_iterator;
+            using map = std::map<Entity, std::size_t>;
 
             Components();
+
+            template<typename ... ARGS>
+            T *insert_entity(const Entity &entity, ARGS &&... args);
 
             inline std::size_t size() const;
             inline bool contain(const Entity &entity) const;
@@ -27,24 +31,19 @@ namespace mce
             inline const_iterator begin() const;
             inline iterator end();
             inline const_iterator end() const;
-            inline void optimize();
 
             void clear();
-            Component<T> &insert_entity(const Entity &entity);
-            Component<T> &at(std::size_t index);
-            const Component<T> &at(std::size_t index) const;
-            Component<T> &get(const Entity &entity);
-            const Component<T> &get(const Entity &entity) const;
+            void remove(const Entity &entity);
+            T *at(std::size_t index);
+            const T *at(std::size_t index) const;
+            T *get(const Entity &entity);
+            const T *get(const Entity &entity) const;
 
         private:
             container _components;
+            map _map;
             Entity _entity_start;
             Entity _entity_end;
-
-            Component<T> &insertFront(const Entity &entity);
-            Component<T> &insertBack(const Entity &entity);
-            void optimizeFront();
-            void optimizeBack();
     };
 }
 
