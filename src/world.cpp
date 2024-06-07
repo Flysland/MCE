@@ -52,14 +52,16 @@ namespace mce
         _destroy_entity_requests.clear();
     }
 
-    void World::launchCustomMethod(std::size_t id)
+    bool World::launchCustomMethod(std::size_t id)
     {
         auto methods = _custom_methods_without_args.find(id);
 
         if (methods == _custom_methods_without_args.end())
-            return;
+            return false;
 
         for (auto &method: methods->second)
             (this->*method)();
+
+        return true;
     }
 }
