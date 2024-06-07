@@ -45,13 +45,13 @@ namespace mce
             void unregisterComponent();
 
             template<typename T, auto M>
-            void registerCustomMethod(std::size_t id);
+            void registerCustomMethod(std::size_t id, bool threaded=false);
 
             template<typename T, auto M>
             void unregisterCustomMethod(std::size_t id);
 
             template<typename T, auto M, typename ... ARGS>
-            std::enable_if_t<(sizeof...(ARGS) > 0), void> registerCustomMethod(std::size_t id);
+            std::enable_if_t<(sizeof...(ARGS) > 0), void> registerCustomMethod(std::size_t id, bool threaded=false);
 
             template<typename T, auto M, typename ... ARGS>
             std::enable_if_t<(sizeof...(ARGS) > 0), void> unregisterCustomMethod(std::size_t id);
@@ -70,6 +70,9 @@ namespace mce
 
             template<typename T, auto M, typename ... ARGS>
             void executeMethod(ARGS &&... args);
+
+            template<typename T, auto M, typename ... ARGS>
+            void executeMethodThreaded(ARGS &&... args);
 
             template<typename T>
             void removeComponent(const Entity &entity);
