@@ -12,6 +12,6 @@ set(
     ${SRC_PATH}/world.cpp
 )
 
-add_executable(tests ${TEST_SRC_FILES})
+add_executable(mce-tests ${TEST_SRC_FILES})
 
-target_link_libraries(tests PRIVATE mce)
+target_link_libraries(mce-tests PRIVATE mce)
