@@ -23,6 +23,8 @@ namespace mce
             void applyRequests();
             bool launchCustomMethod(std::size_t id);
 
+            inline void setMaxThreads(std::size_t max_thread);
+
             template<typename ... ARGS>
             bool launchCustomMethod(std::size_t id, ARGS &&... args);
 
@@ -60,6 +62,7 @@ namespace mce
             Entity _current_entity;
             Entities _available_entities;
             ComponentContainer _components;
+            std::size_t _max_thread;
             RequestContainer<Entity, World, void, const Entity &> _remove_component_requests;
             RequestContainer<Entity, World, void, const Entity &> _destroy_entity_requests;
             MethodContainer<World, void, const Entity &> _remove_component_methods;
