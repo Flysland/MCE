@@ -12,6 +12,27 @@
 
 namespace mce
 {
+    inline void World::setMaxThreads(std::size_t max_thread)
+    {
+        std::size_t hardware_threads = std::thread::hardware_concurrency();
+
+        _max_thread = max_thread <= hardware_threads ? max_thread : hardware_threads != 0 ? hardware_threads : 1;
+    }
+
+    template<typename ... ARGS>
+    bool World::launchCustomMethod(std::size_t id, ARGS &&... args)
+    {
+        auto methods = _custom_methods_with_args.find(id);
+
+        if (methods == _custom_methods_with_args.end())
+            return false;
+
+        for (auto &method: std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second))
+            (this->*method)(std::forward<ARGS>(args)...);
+
+        return true;
+    }
+
     template<typename T, typename ... ARGS>
     T *World::addComponent(const Entity &entity, ARGS &&... args)
     {
@@ -163,20 +184,6 @@ namespace mce
             _custom_methods_with_args.erase(methods);
     }
 
-    template<typename ... ARGS>
-    bool World::launchCustomMethod(std::size_t id, ARGS &&... args)
-    {
-        auto methods = _custom_methods_with_args.find(id);
-
-        if (methods == _custom_methods_with_args.end())
-            return false;
-
-        for (auto &method: std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second))
-            (this->*method)(std::forward<ARGS>(args)...);
-
-        return true;
-    }
-
     inline void World::destroyEntity(const Entity &entity)
     {
         _available_entities.push_back(entity);
@@ -195,21 +202,19 @@ namespace mce
     void World::executeMethodThreaded(ARGS &&... args)
     {
         Components<T> &components = getComponents<T>();
-        std::vector<std::thread> threads;
+        std::vector<std::thread> threads = std::vector<std::thread>();
         auto begin = components.begin();
         auto end = components.end();
-        size_t hardware_threads = std::thread::hardware_concurrency();
-        size_t num_threads = hardware_threads != 0 ? hardware_threads : 2;
-        size_t block_size = components.size() / num_threads;
+        size_t block_size = components.size() / _max_thread;
 
-        threads.reserve(num_threads);
+        threads.reserve(_max_thread);
         auto worker = [&](typename Components<T>::iterator start, typename Components<T>::iterator end) {
             for (auto it = start; it != end; ++it)
                 ((*it).*M)(std::forward<ARGS>(args)...);
         };
 
         auto it = begin;
-        for (size_t i = 0; i < num_threads - 1; ++i) {
+        for (size_t i = 0; i < _max_thread - 1; ++i) {
             auto block_end = std::next(it, block_size);
             threads.emplace_back(worker, it, block_end);
             it = block_end;

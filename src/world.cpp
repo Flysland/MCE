@@ -13,6 +13,7 @@ namespace mce
         : _current_entity(0)
         , _available_entities()
         , _components()
+        , _max_thread(1)
         , _remove_component_requests()
         , _destroy_entity_requests()
         , _remove_component_methods()
