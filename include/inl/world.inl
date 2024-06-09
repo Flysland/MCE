@@ -174,7 +174,7 @@ namespace mce
         container.erase(
             std::remove_if(container.begin(), container.end(),
                 [&](Method<World, void, ARGS...> method) {
-                    return method == &World::executeMethod<T, M, ARGS...>;
+                    return method == &World::executeMethod<T, M, ARGS...> || method == &World::executeMethodThreaded<T, M, ARGS...>;
                 }
             ),
             container.end()
