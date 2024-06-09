@@ -99,7 +99,7 @@ namespace mce
         _components.erase(std::type_index(typeid(T)));
         _remove_component_methods.erase(
             std::remove_if(_remove_component_methods.begin(), _remove_component_methods.end(),
-                [&](void (World::*method)(const Entity &entity)) {
+                [&](Method<World, void, const Entity &> method) {
                     return method == &World::requestRemoveComponent<T>;
                 }),
             _remove_component_methods.end()
