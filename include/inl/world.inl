@@ -85,7 +85,7 @@ namespace mce
         _components.insert({std::type_index(typeid(T)), Components<T>()});
         _remove_component_methods.push_back(&World::requestRemoveComponent<T>);
 
-        registerCustomMethods<T>(this);
+        registerCustomMethods<T>(*this);
     }
 
     template<typename T>
@@ -105,7 +105,7 @@ namespace mce
             _remove_component_methods.end()
         );
 
-        unregisterCustomMethods<T>(this);
+        unregisterCustomMethods<T>(*this);
     }
 
     template<typename T, auto M>
