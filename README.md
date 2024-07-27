@@ -69,32 +69,32 @@ namespace mce
 {
     // Register all custom methods (it called when we register a new component)
     template<typename T>
-    void registerCustomMethods(World *world)
+    void registerCustomMethods(World &world)
     {
         // Check if the type contain the 'physicUpdate' method
         if constexpr(HasPhysicUpdate<T>)
             // Register the 'physicUpdate' method
-            world->registerCustomMethod<T, &T::physicUpdate, double>(PHYSIC_UPDATE_METHOD_ID);
+            world.registerCustomMethod<T, &T::physicUpdate, double>(PHYSIC_UPDATE_METHOD_ID);
 
         // Check if the type contain the 'renderUpdate' method
         if constexpr(HasRenderUpdate<T>)
             // Register the 'renderUpdate' method
-            world->registerCustomMethod<T, &T::renderUpdate>(RENDER_UPDATE_METHOD_ID);
+            world.registerCustomMethod<T, &T::renderUpdate>(RENDER_UPDATE_METHOD_ID);
     }
 
     // Unregister all custom methods (it called when we unregister a component)
     template<typename T>
-    void unregisterCustomMethods(World *world)
+    void unregisterCustomMethods(World &world)
     {
         // Check if the type contain the 'physicUpdate' method
         if constexpr(HasPhysicUpdate<T>)
             // Unregister the 'physicUpdate' method
-            world->unregisterCustomMethod<T, &T::physicUpdate, double>(PHYSIC_UPDATE_METHOD_ID);
+            world.unregisterCustomMethod<T, &T::physicUpdate, double>(PHYSIC_UPDATE_METHOD_ID);
 
         // Check if the type contain the 'renderUpdate' method
         if constexpr(HasRenderUpdate<T>)
             // Register the 'renderUpdate' method
-            world->registerCustomMethod<T, &T::renderUpdate>(RENDER_UPDATE_METHOD_ID);
+            world.registerCustomMethod<T, &T::renderUpdate>(RENDER_UPDATE_METHOD_ID);
     }
 }
 

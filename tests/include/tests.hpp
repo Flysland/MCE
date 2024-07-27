@@ -52,29 +52,29 @@ concept HasReferenceCustomMethod = mce::HasCustomMethod<T, &T::referenceMethod, 
 namespace mce
 {
     template<typename T>
-    void registerCustomMethods(World *world)
+    void registerCustomMethods(World &world)
     {
         if constexpr(HasUpdate<T>)
-            world->registerCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
+            world.registerCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
 
         if constexpr(HasUpdateWithParam<T>)
-            world->registerCustomMethod<T, &T::updateWithParam, int>(UPDATE_WITH_PARAM_METHOD_ID);
+            world.registerCustomMethod<T, &T::updateWithParam, int>(UPDATE_WITH_PARAM_METHOD_ID);
 
         if constexpr(HasReferenceCustomMethod<T>)
-            world->registerCustomMethod<T, &T::referenceMethod, int &>(REFERENCE_CUSTOM_METHOD_ID);
+            world.registerCustomMethod<T, &T::referenceMethod, int &>(REFERENCE_CUSTOM_METHOD_ID);
     }
 
     template<typename T>
-    void unregisterCustomMethods(World *world)
+    void unregisterCustomMethods(World &world)
     {
         if constexpr(HasUpdate<T>)
-            world->unregisterCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
+            world.unregisterCustomMethod<T, &T::update>(UPDATE_METHOD_ID);
 
         if constexpr(HasUpdateWithParam<T>)
-            world->unregisterCustomMethod<T, &T::updateWithParam, int>(UPDATE_WITH_PARAM_METHOD_ID);
+            world.unregisterCustomMethod<T, &T::updateWithParam, int>(UPDATE_WITH_PARAM_METHOD_ID);
 
         if constexpr(HasReferenceCustomMethod<T>)
-            world->unregisterCustomMethod<T, &T::referenceMethod, int &>(REFERENCE_CUSTOM_METHOD_ID);
+            world.unregisterCustomMethod<T, &T::referenceMethod, int &>(REFERENCE_CUSTOM_METHOD_ID);
     }
 }
 
