@@ -15,7 +15,6 @@ namespace mce
     struct Require
     {
         void applyRequiredComponents(World &world, const Entity &entity);
-        bool isAvailableToRemove(World &world, const Entity &entity);
     };
 }
 

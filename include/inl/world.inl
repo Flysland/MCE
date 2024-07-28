@@ -236,10 +236,6 @@ namespace mce
         if (!components.contain(entity))
             return;
 
-        if constexpr(HasIsAvailableToRemove<T>)
-            if (!components.get(entity)->isAvailableToRemove(*this, entity))
-                return;
-
         components.remove(entity);
 
         if (!components.size())
