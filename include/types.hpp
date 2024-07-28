@@ -45,8 +45,5 @@ namespace mce
     concept HasApplyRequiredComponents = HasCustomMethod<T, &T::applyRequiredComponents, World &, const Entity &>;
 
     template<typename T>
-    concept HasIsAvailableToRemove = HasMethod<T, &T::isAvailableToRemove, bool, World &, const Entity &>;
-
-    template<typename T>
     concept HasInit = HasCustomMethod<T, &T::init, World &, const Entity &>;
 }
