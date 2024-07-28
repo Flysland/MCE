@@ -43,6 +43,9 @@ namespace mce
 
         components.insertEntity(entity, std::forward<ARGS>(args)...);
 
+        if constexpr(HasApplyRequiredComponents<T>)
+            components.get(entity)->applyRequiredComponents(*this, entity);
+
         if constexpr(HasInit<T>)
             components.get(entity)->init(*this, entity);
 
@@ -232,6 +235,10 @@ namespace mce
 
         if (!components.contain(entity))
             return;
+
+        if constexpr(HasIsAvailableToRemove<T>)
+            if (!components.get(entity)->isAvailableToRemove(*this, entity))
+                return;
 
         components.remove(entity);
 
