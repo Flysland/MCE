@@ -13,6 +13,7 @@ namespace mce
         : _current_entity(0)
         , _available_entities()
         , _components()
+        , _components_dependency()
         , _max_thread(1)
         , _remove_component_requests()
         , _destroy_entity_requests()
@@ -37,6 +38,8 @@ namespace mce
     {
         for (auto &method: _remove_component_methods)
             (this->*method)(entity);
+
+        // TODO: implement force remove component for destroy entity
 
         _destroy_entity_requests.push_back({entity, &World::destroyEntity});
     }

@@ -115,22 +115,20 @@ namespace testing
         CHECK(world.getComponents<float>().size() == 1)
         CHECK(world.getComponents<double>().size() == 1)
 
-        world.requestRemoveComponent<TestComponentInit>(entity);
-        world.applyRequests();
-
-        CHECK(world.getComponents<TestComponentInit>().size() == 1)
-
         world.requestRemoveComponent<float>(entity);
-        world.requestRemoveComponent<TestComponentInit>(entity);
-        world.applyRequests();
-
-        CHECK(world.getComponents<TestComponentInit>().size() == 1)
-
         world.requestRemoveComponent<double>(entity);
-        world.requestRemoveComponent<TestComponentInit>(entity);
         world.applyRequests();
 
-        CHECK(world.getComponents<TestComponentInit>().size() == 0)
+        CHECK(world.getComponents<float>().size() == 1)
+        CHECK(world.getComponents<double>().size() == 1)
+
+        world.requestRemoveComponent<TestComponentInit>(entity);
+        world.requestRemoveComponent<float>(entity);
+        world.requestRemoveComponent<double>(entity);
+        world.applyRequests();
+
+        CHECK(world.getComponents<float>().size() == 0)
+        CHECK(world.getComponents<double>().size() == 0)
 
         world.addComponent<TestComponentUpdate>(entity);
 
