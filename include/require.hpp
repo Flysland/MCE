@@ -14,7 +14,13 @@ namespace mce
     template<typename ... COMPONENTS>
     struct Require
     {
-        void applyRequiredComponents(World &world, const Entity &entity);
+        inline void applyRequiredComponents(World &world, const Entity &entity);
+
+        template<typename T>
+        inline static void initDependency(World &world);
+
+        template<typename T>
+        inline static void removeDependency(World &world);
     };
 }
 

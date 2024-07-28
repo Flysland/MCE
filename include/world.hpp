@@ -12,8 +12,14 @@
 
 namespace mce
 {
+    template<typename ... COMPONENTS>
+    struct Require;
+
     class World
     {
+        template<typename ... COMPONENTS>
+        friend struct Require;
+
         public:
             World();
 
@@ -30,6 +36,9 @@ namespace mce
 
             template<typename T, typename ... ARGS>
             T *addComponent(const Entity &entity, ARGS &&... args);
+
+            template<typename T>
+            bool hasComponent(const Entity &entity);
 
             template<typename T>
             inline void requestRemoveComponent(const Entity &entity);
@@ -62,6 +71,7 @@ namespace mce
             Entity _current_entity;
             Entities _available_entities;
             ComponentContainer _components;
+            ComponentsDependency _components_dependency;
             std::size_t _max_thread;
             RequestContainer<Entity, World, void, const Entity &> _remove_component_requests;
             RequestContainer<Entity, World, void, const Entity &> _destroy_entity_requests;
@@ -76,6 +86,12 @@ namespace mce
 
             template<typename T, auto M, typename ... ARGS>
             void executeMethodThreaded(ARGS &&... args);
+
+            template<typename T, typename REQUIRED>
+            void initDependency();
+
+            template<typename T, typename REQUIRED>
+            void removeDependency();
 
             template<typename T>
             void removeComponent(const Entity &entity);

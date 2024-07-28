@@ -32,10 +32,18 @@ namespace mce
     template<typename T, typename R, typename ... ARGS>
     using MethodContainer = std::vector<Method<T, R, ARGS...>>;
 
+    using ComponentsDependency = std::unordered_map<std::type_index, MethodContainer<World, bool, const Entity &>>;
+
     template<typename T, auto M, typename R, typename ... ARGS>
     concept HasMethod = requires(T &t, ARGS &&... args)
     {
         { (t.*M)(std::forward<ARGS>(args)...) } -> std::same_as<R>;
+    };
+
+    template<auto M, typename R, typename ... ARGS>
+    concept HasStaticMethod = requires(ARGS &&... args)
+    {
+        { M(std::forward<ARGS>(args)...) } -> std::same_as<R>;
     };
 
     template<typename T, auto M, typename ... ARGS>
@@ -43,6 +51,12 @@ namespace mce
 
     template<typename T>
     concept HasApplyRequiredComponents = HasCustomMethod<T, &T::applyRequiredComponents, World &, const Entity &>;
+
+    template<typename T>
+    concept HasInitDependency = HasStaticMethod<&T::template initDependency<T>, void, World &>;
+
+    template<typename T>
+    concept HasRemoveDependency = HasStaticMethod<&T::template removeDependency<T>, void, World &>;
 
     template<typename T>
     concept HasInit = HasCustomMethod<T, &T::init, World &, const Entity &>;
