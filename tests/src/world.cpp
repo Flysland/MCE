@@ -6,10 +6,11 @@
 ////////////////////////
 
 #include "tests.hpp"
+#include "mce/require.hpp"
 
 namespace testing
 {
-    using TestComponentInit = struct TestComponentInit
+    using TestComponentInit = struct TestComponentInit : mce::Require<float, double>
     {
         bool init_called;
         mce::World *world;
@@ -111,6 +112,25 @@ namespace testing
         CHECK(world.getComponent<TestComponentInit>(entity)->init_called)
         CHECK(world.getComponent<TestComponentInit>(entity)->world == &world)
         CHECK(world.getComponent<TestComponentInit>(entity)->entity == entity)
+        CHECK(world.getComponents<float>().size() == 1)
+        CHECK(world.getComponents<double>().size() == 1)
+
+        world.requestRemoveComponent<TestComponentInit>(entity);
+        world.applyRequests();
+
+        CHECK(world.getComponents<TestComponentInit>().size() == 1)
+
+        world.requestRemoveComponent<float>(entity);
+        world.requestRemoveComponent<TestComponentInit>(entity);
+        world.applyRequests();
+
+        CHECK(world.getComponents<TestComponentInit>().size() == 1)
+
+        world.requestRemoveComponent<double>(entity);
+        world.requestRemoveComponent<TestComponentInit>(entity);
+        world.applyRequests();
+
+        CHECK(world.getComponents<TestComponentInit>().size() == 0)
 
         world.addComponent<TestComponentUpdate>(entity);
 
