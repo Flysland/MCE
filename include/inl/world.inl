@@ -7,7 +7,6 @@
 
 #include <algorithm>
 #include <thread>
-#include <iostream>
 #include "mce/world.hpp"
 
 namespace mce
@@ -38,13 +37,13 @@ namespace mce
     {
         Components<T> &components = getComponents<T>();
 
+        if constexpr(HasApplyRequiredComponents<T>)
+            components.get(entity)->applyRequiredComponents(*this, entity);
+
         if (components.contain(entity))
             return components.get(entity);
 
         components.insertEntity(entity, std::forward<ARGS>(args)...);
-
-        if constexpr(HasApplyRequiredComponents<T>)
-            components.get(entity)->applyRequiredComponents(*this, entity);
 
         if constexpr(HasInit<T>)
             components.get(entity)->init(*this, entity);
@@ -59,9 +58,14 @@ namespace mce
     }
 
     template<typename T>
-    inline void World::requestRemoveComponent(const Entity &entity)
+    inline void World::requestRemoveComponent(const Entity &entity, bool force)
     {
-        _remove_component_requests.push_back({entity, &World::removeComponent<T>});
+        RequestRemoveComponent request = RequestRemoveComponent();
+        request.request = &World::removeComponent<T>;
+        request.entity = entity;
+        request.force = force;
+
+        _remove_component_requests.push_back(request);
     }
 
     template<typename T>
@@ -95,7 +99,7 @@ namespace mce
             T::template initDependency<T>(*this);
 
         _components.insert({std::type_index(typeid(T)), Components<T>()});
-        _remove_component_methods.push_back(&World::requestRemoveComponent<T>);
+        _remove_component_methods.push_back(&World::removeComponent<T>);
 
         registerCustomMethods<T>(*this);
     }
@@ -114,8 +118,8 @@ namespace mce
         _components.erase(std::type_index(typeid(T)));
         _remove_component_methods.erase(
             std::remove_if(_remove_component_methods.begin(), _remove_component_methods.end(),
-                [&](Method<World, void, const Entity &> method) {
-                    return method == &World::requestRemoveComponent<T>;
+                [&](Method<World, void, const Entity &, bool &&> method) {
+                    return method == &World::removeComponent<T>;
                 }),
             _remove_component_methods.end()
         );
@@ -199,11 +203,6 @@ namespace mce
             _custom_methods_with_args.erase(methods);
     }
 
-    inline void World::destroyEntity(const Entity &entity)
-    {
-        _available_entities.push_back(entity);
-    }
-
     template<typename T, auto M, typename ... ARGS>
     void World::executeMethod(ARGS &&... args)
     {
@@ -277,19 +276,22 @@ namespace mce
     }
 
     template<typename T>
-    void World::removeComponent(const Entity &entity)
+    void World::removeComponent(const Entity &entity, bool &&force)
     {
         Components<T> &components = getComponents<T>();
 
         if (!components.contain(entity))
             return;
 
-        auto components_dependency = _components_dependency.find(std::type_index(typeid(T)));
 
-        if (components_dependency != _components_dependency.end())
-            for (auto check_dependency: components_dependency->second)
-                if ((this->*check_dependency)(entity))
-                    return;
+        if (!force) {
+            auto components_dependency = _components_dependency.find(std::type_index(typeid(T)));
+
+            if (components_dependency != _components_dependency.end())
+                for (auto check_dependency: components_dependency->second)
+                    if ((this->*check_dependency)(entity))
+                        return;
+        }
 
         components.remove(entity);
 

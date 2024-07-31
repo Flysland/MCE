@@ -9,6 +9,7 @@
 
 #include "mce/types.hpp"
 #include "mce/components.hpp"
+#include "mce/requests.hpp"
 
 namespace mce
 {
@@ -41,7 +42,7 @@ namespace mce
             bool hasComponent(const Entity &entity);
 
             template<typename T>
-            inline void requestRemoveComponent(const Entity &entity);
+            inline void requestRemoveComponent(const Entity &entity, bool force = false);
 
             template<typename T>
             inline T *getComponent(const Entity &entity);
@@ -73,13 +74,13 @@ namespace mce
             ComponentContainer _components;
             ComponentsDependency _components_dependency;
             std::size_t _max_thread;
-            RequestContainer<Entity, World, void, const Entity &> _remove_component_requests;
-            RequestContainer<Entity, World, void, const Entity &> _destroy_entity_requests;
-            MethodContainer<World, void, const Entity &> _remove_component_methods;
+            RequestContainer<RequestRemoveComponent> _remove_component_requests;
+            RequestContainer<RequestDestroyEntity> _destroy_entity_requests;
+            MethodContainer<World, void, const Entity &, bool> _remove_component_methods;
             std::unordered_map<std::size_t, std::any> _custom_methods_with_args;
             std::unordered_map<std::size_t, MethodContainer<World, void>> _custom_methods_without_args;
 
-            inline void destroyEntity(const Entity &entity);
+            void destroyEntity(const Entity &entity);
 
             template<typename T, auto M, typename ... ARGS>
             void executeMethod(ARGS &&... args);
@@ -94,7 +95,7 @@ namespace mce
             void removeDependency();
 
             template<typename T>
-            void removeComponent(const Entity &entity);
+            void removeComponent(const Entity &entity, bool &&force);
     };
 }
 

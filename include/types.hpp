@@ -26,9 +26,6 @@ namespace mce
     template<typename T, typename R, typename ... ARGS>
     using Method = R (T::*)(ARGS &&...);
 
-    template<typename KEY, typename T, typename R, typename ... ARGS>
-    using RequestContainer = std::vector<std::pair<KEY, Method<T, R, ARGS...>>>;
-
     template<typename T, typename R, typename ... ARGS>
     using MethodContainer = std::vector<Method<T, R, ARGS...>>;
 

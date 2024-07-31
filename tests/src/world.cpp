@@ -109,6 +109,21 @@ namespace testing
 
         world.addComponent<TestComponentInit>(entity);
 
+        world.requestDestroyEntity(entity);
+        world.applyRequests();
+        entity = world.createEntity();
+
+        world.addComponent<TestComponentInit>(entity);
+
+        world.requestRemoveComponent<float>(entity, true);
+        world.applyRequests();
+
+        CHECK(world.getComponent<float>(entity) == nullptr);
+        CHECK(world.getComponent<double>(entity) != nullptr);
+        CHECK(world.getComponent<TestComponentInit>(entity) != nullptr);
+
+        world.addComponent<TestComponentInit>(entity);
+
         CHECK(world.getComponent<TestComponentInit>(entity)->init_called)
         CHECK(world.getComponent<TestComponentInit>(entity)->world == &world)
         CHECK(world.getComponent<TestComponentInit>(entity)->entity == entity)
