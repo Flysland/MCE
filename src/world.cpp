@@ -36,21 +36,20 @@ namespace mce
 
     void World::requestDestroyEntity(const Entity &entity)
     {
-        for (auto &method: _remove_component_methods)
-            (this->*method)(entity);
+        RequestDestroyEntity request = RequestDestroyEntity();
+        request.entity = entity;
+        request.request = &World::destroyEntity;
 
-        // TODO: implement force remove component for destroy entity
-
-        _destroy_entity_requests.push_back({entity, &World::destroyEntity});
+        _destroy_entity_requests.push_back(request);
     }
 
     void World::applyRequests()
     {
         for (auto &request: _remove_component_requests)
-            (this->*request.second)(request.first);
+            (this->*request.request)(request.entity, std::move(request.force));
 
         for (auto &request: _destroy_entity_requests)
-            (this->*request.second)(request.first);
+            (this->*request.request)(request.entity);
 
         _remove_component_requests.clear();
         _destroy_entity_requests.clear();
@@ -67,5 +66,13 @@ namespace mce
             (this->*method)();
 
         return true;
+    }
+
+    void World::destroyEntity(const Entity &entity)
+    {
+        _available_entities.push_back(entity);
+
+        for (auto &method: _remove_component_methods)
+            (this->*method)(entity, true);
     }
 }
