@@ -58,7 +58,7 @@ namespace mce
     }
 
     template<typename T>
-    inline void World::requestRemoveComponent(const Entity &entity, bool force)
+    void World::requestRemoveComponent(const Entity &entity, bool force)
     {
         RequestRemoveComponent request = RequestRemoveComponent();
         request.request = &World::removeComponent<T>;
@@ -245,11 +245,12 @@ namespace mce
         auto components_dependency = _components_dependency.find(std::type_index(typeid(REQUIRED)));
 
         if (components_dependency == _components_dependency.end()) {
-            _components_dependency.insert({std::type_index(typeid(REQUIRED)), MethodContainer<World, bool, const Entity &>()});
+            _components_dependency.insert({std::type_index(typeid(REQUIRED)), ComponentDependency()});
             components_dependency = _components_dependency.find(std::type_index(typeid(REQUIRED)));
         }
 
-        components_dependency->second.push_back(&World::hasComponent<T>);
+        components_dependency->second.contain_main_components.push_back(&World::hasComponent<T>);
+        components_dependency->second.remove_main_components.push_back(&World::removeComponent<T>);
     }
 
     template<typename T, typename REQUIRED>
@@ -260,18 +261,27 @@ namespace mce
         if (components_dependency == _components_dependency.end())
             return;
 
-        MethodContainer<World, bool, const Entity &> &container = components_dependency->second;
+        ComponentDependency &dependency = components_dependency->second;
 
-        container.erase(
-            std::remove_if(container.begin(), container.end(),
+        dependency.contain_main_components.erase(
+            std::remove_if(dependency.contain_main_components.begin(), dependency.contain_main_components.end(),
                 [&](Method<World, bool, const Entity &> method) {
                     return method == &World::hasComponent<T>;
                 }
             ),
-            container.end()
+            dependency.contain_main_components.end()
         );
 
-        if (!container.size())
+        dependency.remove_main_components.erase(
+            std::remove_if(dependency.remove_main_components.begin(), dependency.remove_main_components.end(),
+                [&](Method<World, void, const Entity &, bool &&> method) {
+                    return method == &World::removeComponent<T>;
+                }
+            ),
+            dependency.remove_main_components.end()
+        );
+
+        if (!dependency.contain_main_components.size() && !dependency.remove_main_components.size())
             _components_dependency.erase(components_dependency);
     }
 
@@ -283,13 +293,15 @@ namespace mce
         if (!components.contain(entity))
             return;
 
+        auto components_dependency = _components_dependency.find(std::type_index(typeid(T)));
 
-        if (!force) {
-            auto components_dependency = _components_dependency.find(std::type_index(typeid(T)));
-
-            if (components_dependency != _components_dependency.end())
-                for (auto check_dependency: components_dependency->second)
-                    if ((this->*check_dependency)(entity))
+        if (components_dependency != _components_dependency.end()) {
+            if (force)
+                for (auto &remove_main_component: components_dependency->second.remove_main_components)
+                    (this->*remove_main_component)(entity, true);
+            else
+                for (auto &contain_main_component: components_dependency->second.contain_main_components)
+                    if ((this->*contain_main_component)(entity))
                         return;
         }
 

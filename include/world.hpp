@@ -8,6 +8,7 @@
 #pragma once
 
 #include "mce/types.hpp"
+#include "mce/dependency.hpp"
 #include "mce/components.hpp"
 #include "mce/requests.hpp"
 
@@ -42,7 +43,7 @@ namespace mce
             bool hasComponent(const Entity &entity);
 
             template<typename T>
-            inline void requestRemoveComponent(const Entity &entity, bool force = false);
+            void requestRemoveComponent(const Entity &entity, bool force = false);
 
             template<typename T>
             inline T *getComponent(const Entity &entity);
