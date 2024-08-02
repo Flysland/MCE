@@ -31,8 +31,6 @@ namespace mce
             void applyRequests();
             bool launchCustomMethod(std::size_t id);
 
-            inline void setMaxThreads(std::size_t max_thread);
-
             template<typename ... ARGS>
             bool launchCustomMethod(std::size_t id, ARGS &&... args);
 
@@ -58,13 +56,13 @@ namespace mce
             void unregisterComponent();
 
             template<typename T, auto M>
-            void registerCustomMethod(std::size_t id, bool threaded=false);
+            void registerCustomMethod(std::size_t id);
 
             template<typename T, auto M>
             void unregisterCustomMethod(std::size_t id);
 
             template<typename T, auto M, typename ... ARGS>
-            std::enable_if_t<(sizeof...(ARGS) > 0), void> registerCustomMethod(std::size_t id, bool threaded=false);
+            std::enable_if_t<(sizeof...(ARGS) > 0), void> registerCustomMethod(std::size_t id);
 
             template<typename T, auto M, typename ... ARGS>
             std::enable_if_t<(sizeof...(ARGS) > 0), void> unregisterCustomMethod(std::size_t id);
@@ -74,7 +72,6 @@ namespace mce
             Entities _available_entities;
             ComponentContainer _components;
             ComponentsDependency _components_dependency;
-            std::size_t _max_thread;
             RequestContainer<RequestRemoveComponent> _remove_component_requests;
             RequestContainer<RequestDestroyEntity> _destroy_entity_requests;
             MethodContainer<World, void, const Entity &, bool> _remove_component_methods;
@@ -85,9 +82,6 @@ namespace mce
 
             template<typename T, auto M, typename ... ARGS>
             void executeMethod(ARGS &&... args);
-
-            template<typename T, auto M, typename ... ARGS>
-            void executeMethodThreaded(ARGS &&... args);
 
             template<typename T, typename REQUIRED>
             void initDependency();
