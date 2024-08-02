@@ -11,13 +11,6 @@
 
 namespace mce
 {
-    inline void World::setMaxThreads(std::size_t max_thread)
-    {
-        std::size_t hardware_threads = std::thread::hardware_concurrency();
-
-        _max_thread = max_thread <= hardware_threads ? max_thread : hardware_threads != 0 ? hardware_threads : 1;
-    }
-
     template<typename ... ARGS>
     bool World::launchCustomMethod(std::size_t id, ARGS &&... args)
     {
@@ -128,7 +121,7 @@ namespace mce
     }
 
     template<typename T, auto M>
-    void World::registerCustomMethod(std::size_t id, bool threaded)
+    void World::registerCustomMethod(std::size_t id)
     {
         auto methods = _custom_methods_without_args.find(id);
 
@@ -137,10 +130,7 @@ namespace mce
             methods = _custom_methods_without_args.find(id);
         }
 
-        if (threaded)
-            methods->second.push_back(&World::executeMethodThreaded<T, M>);
-        else
-            methods->second.push_back(&World::executeMethod<T, M>);
+        methods->second.push_back(&World::executeMethod<T, M>);
     }
 
     template<typename T, auto M>
@@ -165,7 +155,7 @@ namespace mce
     }
 
     template<typename T, auto M, typename ... ARGS>
-    std::enable_if_t<(sizeof...(ARGS) > 0), void> World::registerCustomMethod(std::size_t id, bool threaded)
+    std::enable_if_t<(sizeof...(ARGS) > 0), void> World::registerCustomMethod(std::size_t id)
     {
         auto methods = _custom_methods_with_args.find(id);
 
@@ -174,10 +164,7 @@ namespace mce
             methods = _custom_methods_with_args.find(id);
         }
 
-        if (threaded)
-            std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethodThreaded<T, M, ARGS...>);
-        else
-            std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethod<T, M, ARGS...>);
+        std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethod<T, M, ARGS...>);
     }
 
     template<typename T, auto M, typename ... ARGS>
@@ -193,7 +180,7 @@ namespace mce
         container.erase(
             std::remove_if(container.begin(), container.end(),
                 [&](Method<World, void, ARGS...> method) {
-                    return method == &World::executeMethod<T, M, ARGS...> || method == &World::executeMethodThreaded<T, M, ARGS...>;
+                    return method == &World::executeMethod<T, M, ARGS...>;
                 }
             ),
             container.end()
@@ -210,33 +197,6 @@ namespace mce
 
         for (T &component: components)
             (component.*M)(std::forward<ARGS>(args)...);
-    }
-
-    template<typename T, auto M, typename ... ARGS>
-    void World::executeMethodThreaded(ARGS &&... args)
-    {
-        Components<T> &components = getComponents<T>();
-        std::vector<std::thread> threads = std::vector<std::thread>();
-        auto begin = components.begin();
-        auto end = components.end();
-        size_t block_size = components.size() / _max_thread;
-
-        threads.reserve(_max_thread);
-        auto worker = [&](typename Components<T>::iterator start, typename Components<T>::iterator end) {
-            for (auto it = start; it != end; ++it)
-                ((*it).*M)(std::forward<ARGS>(args)...);
-        };
-
-        auto it = begin;
-        for (size_t i = 0; i < _max_thread - 1; ++i) {
-            auto block_end = std::next(it, block_size);
-            threads.emplace_back(worker, it, block_end);
-            it = block_end;
-        }
-        threads.emplace_back(worker, it, end);
-
-        for (std::thread &t: threads)
-            t.join();
     }
 
     template<typename T, typename REQUIRED>
