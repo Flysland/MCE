@@ -120,7 +120,7 @@ namespace testing
 
         CHECK(world.getComponent<float>(entity) == nullptr);
         CHECK(world.getComponent<double>(entity) != nullptr);
-        CHECK(world.getComponent<TestComponentInit>(entity) != nullptr);
+        CHECK(world.getComponent<TestComponentInit>(entity) == nullptr);
 
         world.addComponent<TestComponentInit>(entity);
 
