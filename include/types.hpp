@@ -29,8 +29,6 @@ namespace mce
     template<typename T, typename R, typename ... ARGS>
     using MethodContainer = std::vector<Method<T, R, ARGS...>>;
 
-    using ComponentsDependency = std::unordered_map<std::type_index, MethodContainer<World, bool, const Entity &>>;
-
     template<typename T, auto M, typename R, typename ... ARGS>
     concept HasMethod = requires(T &t, ARGS &&... args)
     {
