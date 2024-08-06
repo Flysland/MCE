@@ -164,6 +164,11 @@ namespace testing
 
         CHECK(world.getComponent<TestComponentUpdate>(entity)->ptr == &value);
         CHECK(value == 12);
+
+        world.requestDestroyEntity(entity);
+        world.requestDestroyEntity(entity2);
+        world.applyRequests();
+
         TERMINATE_TEST()
     }
 }

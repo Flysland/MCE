@@ -250,8 +250,12 @@ namespace mce
     {
         Components<T> &components = getComponents<T>();
 
-        if (!components.contain(entity))
+        if (!components.contain(entity)) {
+            if (!components.size())
+                unregisterComponent<T>();
+
             return;
+        }
 
         auto components_dependency = _components_dependency.find(std::type_index(typeid(T)));
 
