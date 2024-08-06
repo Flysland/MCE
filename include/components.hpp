@@ -42,8 +42,6 @@ namespace mce
         private:
             container _components;
             map _map;
-            Entity _entity_start;
-            Entity _entity_end;
     };
 }
 

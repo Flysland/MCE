@@ -13,8 +13,6 @@ namespace mce
     Components<T>::Components()
         : _components()
         , _map()
-        , _entity_start(0)
-        , _entity_end(0)
     { }
 
     template<typename T>
@@ -72,8 +70,6 @@ namespace mce
     {
         _components.clear();
         _map.clear();
-        _entity_start = 0;
-        _entity_end = 0;
     }
 
     template<typename T>
