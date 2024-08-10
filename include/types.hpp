@@ -27,7 +27,7 @@ namespace mce
     using Method = R (T::*)(ARGS &&...);
 
     template<typename T, typename R, typename ... ARGS>
-    using MethodContainer = std::vector<Method<T, R, ARGS...>>;
+    using Methods = std::vector<Method<T, R, ARGS...>>;
 
     template<typename T, auto M, typename R, typename ... ARGS>
     concept HasMethod = requires(T &t, ARGS &&... args)

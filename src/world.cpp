@@ -16,6 +16,7 @@ namespace mce
         , _components_dependency()
         , _remove_component_requests()
         , _destroy_entity_requests()
+        , _unregister_component_requests()
         , _remove_component_methods()
         , _custom_methods_with_args()
         , _custom_methods_without_args()
@@ -50,8 +51,12 @@ namespace mce
         for (auto &request: _destroy_entity_requests)
             (this->*request.request)(request.entity);
 
+        for (auto &request: _unregister_component_requests)
+            (this->*request.request)();
+
         _remove_component_requests.clear();
         _destroy_entity_requests.clear();
+        _unregister_component_requests.clear();
     }
 
     bool World::launchCustomMethod(std::size_t id)

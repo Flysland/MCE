@@ -28,6 +28,11 @@ namespace mce
         Entity entity;
     };
 
+    struct RequestUnregisterComponent : public Request<World, void>
+    {
+
+    };
+
     template<typename T>
-    using RequestContainer = std::vector<T>;
+    using Requests = std::vector<T>;
 }

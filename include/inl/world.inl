@@ -19,7 +19,7 @@ namespace mce
         if (methods == _custom_methods_with_args.end())
             return false;
 
-        for (auto &method: std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second))
+        for (auto &method: std::any_cast<Methods<World, void, ARGS...> &>(methods->second))
             (this->*method)(std::forward<ARGS>(args)...);
 
         return true;
@@ -98,26 +98,12 @@ namespace mce
     }
 
     template<typename T>
-    void World::unregisterComponent()
+    void World::requestUnregisterComponent()
     {
-        auto components = _components.find(std::type_index(typeid(T)));
+        RequestUnregisterComponent request = RequestUnregisterComponent();
+        request.request = &World::unregisterComponent<T>;
 
-        if (components == _components.end())
-            return;
-
-        if constexpr(HasRemoveDependency<T>)
-            T::template removeDependency<T>(*this);
-
-        _components.erase(std::type_index(typeid(T)));
-        _remove_component_methods.erase(
-            std::remove_if(_remove_component_methods.begin(), _remove_component_methods.end(),
-                [&](Method<World, void, const Entity &, bool &&> method) {
-                    return method == &World::removeComponent<T>;
-                }),
-            _remove_component_methods.end()
-        );
-
-        unregisterCustomMethods<T>(*this);
+        _unregister_component_requests.push_back(request);
     }
 
     template<typename T, auto M>
@@ -126,7 +112,7 @@ namespace mce
         auto methods = _custom_methods_without_args.find(id);
 
         if (methods == _custom_methods_without_args.end()) {
-            _custom_methods_without_args.insert({id, MethodContainer<World, void>()});
+            _custom_methods_without_args.insert({id, Methods<World, void>()});
             methods = _custom_methods_without_args.find(id);
         }
 
@@ -160,11 +146,11 @@ namespace mce
         auto methods = _custom_methods_with_args.find(id);
 
         if (methods == _custom_methods_with_args.end()) {
-            _custom_methods_with_args.insert({id, MethodContainer<World, void, ARGS...>()});
+            _custom_methods_with_args.insert({id, Methods<World, void, ARGS...>()});
             methods = _custom_methods_with_args.find(id);
         }
 
-        std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethod<T, M, ARGS...>);
+        std::any_cast<Methods<World, void, ARGS...> &>(methods->second).push_back(&World::executeMethod<T, M, ARGS...>);
     }
 
     template<typename T, auto M, typename ... ARGS>
@@ -175,7 +161,7 @@ namespace mce
         if (methods == _custom_methods_with_args.end())
             return;
 
-        MethodContainer<World, void, ARGS...> &container = std::any_cast<MethodContainer<World, void, ARGS...> &>(methods->second);
+        Methods<World, void, ARGS...> &container = std::any_cast<Methods<World, void, ARGS...> &>(methods->second);
 
         container.erase(
             std::remove_if(container.begin(), container.end(),
@@ -246,13 +232,36 @@ namespace mce
     }
 
     template<typename T>
+    void World::unregisterComponent()
+    {
+        auto components = _components.find(std::type_index(typeid(T)));
+
+        if (components == _components.end())
+            return;
+
+        if constexpr(HasRemoveDependency<T>)
+            T::template removeDependency<T>(*this);
+
+        _components.erase(std::type_index(typeid(T)));
+        _remove_component_methods.erase(
+            std::remove_if(_remove_component_methods.begin(), _remove_component_methods.end(),
+                [&](Method<World, void, const Entity &, bool &&> method) {
+                    return method == &World::removeComponent<T>;
+                }),
+            _remove_component_methods.end()
+        );
+
+        unregisterCustomMethods<T>(*this);
+    }
+
+    template<typename T>
     void World::removeComponent(const Entity &entity, bool &&force)
     {
         Components<T> &components = getComponents<T>();
 
         if (!components.contain(entity)) {
             if (!components.size())
-                unregisterComponent<T>();
+                requestUnregisterComponent<T>();
 
             return;
         }
@@ -272,6 +281,6 @@ namespace mce
         components.remove(entity);
 
         if (!components.size())
-            unregisterComponent<T>();
+            requestUnregisterComponent<T>();
     }
 }

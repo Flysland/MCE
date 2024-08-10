@@ -53,7 +53,7 @@ namespace mce
             void registerComponent();
 
             template<typename T>
-            void unregisterComponent();
+            void requestUnregisterComponent();
 
             template<typename T, auto M>
             void registerCustomMethod(std::size_t id);
@@ -72,11 +72,12 @@ namespace mce
             Entities _available_entities;
             ComponentContainer _components;
             ComponentsDependency _components_dependency;
-            RequestContainer<RequestRemoveComponent> _remove_component_requests;
-            RequestContainer<RequestDestroyEntity> _destroy_entity_requests;
-            MethodContainer<World, void, const Entity &, bool> _remove_component_methods;
+            Requests<RequestRemoveComponent> _remove_component_requests;
+            Requests<RequestDestroyEntity> _destroy_entity_requests;
+            Requests<RequestUnregisterComponent> _unregister_component_requests;
+            Methods<World, void, const Entity &, bool> _remove_component_methods;
             std::unordered_map<std::size_t, std::any> _custom_methods_with_args;
-            std::unordered_map<std::size_t, MethodContainer<World, void>> _custom_methods_without_args;
+            std::unordered_map<std::size_t, Methods<World, void>> _custom_methods_without_args;
 
             void destroyEntity(const Entity &entity);
 
@@ -88,6 +89,9 @@ namespace mce
 
             template<typename T, typename REQUIRED>
             void removeDependency();
+
+            template<typename T>
+            void unregisterComponent();
 
             template<typename T>
             void removeComponent(const Entity &entity, bool &&force);
